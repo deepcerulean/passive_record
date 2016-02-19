@@ -10,11 +10,16 @@
 
 PassiveRecord is an extremely lightweight in-memory pseudo-relational algebra.
 
-We simplified subset of AR's interface in pure Ruby.
+We implement a simplified subset of AR's interface in pure Ruby.
 
-Maybe you need to track objects by ID and look them up again,
+## Why?
+
+Do you need to track objects by ID and look them up again,
 or look them up based on attributes, or even utilize some limited relational semantics,
-but have no real need for persistence.
+but have no real need for persistence?
+
+PassiveRecord may be right for you.
+
 
 ## Features
 
@@ -46,13 +51,15 @@ but have no real need for persistence.
     end
 
     # Let's create some models!
-    child = Child.create
+    parent = Parent.create
+
+    child = parent.create_child
     dog = child.create_dog
 
     # inverse relationships
     dog.child # ==> child
 
-    parent = Parent.create
+    # has many thru
     parent.dogs # ==> [dog]
  
 
