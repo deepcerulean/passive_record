@@ -16,8 +16,8 @@ module PassiveRecord
         child_class.find_by(parent_model_id_field => parent_model.id)
       end
 
-      def create
-        model = child_class.create # association.child_class.create
+      def create(*args)
+        model = child_class.create(*args)
         model.send(parent_model_id_field + "=", parent_model.id)
         model
       end

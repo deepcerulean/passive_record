@@ -26,8 +26,8 @@ module PassiveRecord
           meth.to_s == relation.association.target_name_symbol.to_s + "=" ||
           meth.to_s == relation.association.target_name_symbol.to_s + "_id" ||
           meth.to_s == relation.association.target_name_symbol.to_s + "_id=" ||
-          meth.to_s == "create_" + relation.association.target_name_symbol.to_s || # + "_id="
-          meth.to_s == "create_" + (relation.association.target_name_symbol.to_s).singularize # + "_id="
+          meth.to_s == "create_" + relation.association.target_name_symbol.to_s ||
+          meth.to_s == "create_" + (relation.association.target_name_symbol.to_s).singularize
       end
 
       if matching_relation

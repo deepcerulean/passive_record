@@ -81,8 +81,25 @@ describe Model do
     it 'should manage many-to-many relations' do
       expect(appointment.doctor).to eq(doctor)
       expect(appointment.patient).to eq(patient)
+
       expect(patient.doctors).to eq([doctor])
       expect(doctor.patients).to eq([patient])
+    end
+  end
+  
+  context 'self-referential many-to-many' do
+    let!(:user_a) { User.create }
+    let!(:user_b) { User.create }
+
+    it 'should permit relations' do
+      expect(user_a.friends).to be_empty
+
+      # need to create bidirectional friendship
+      Friendship.create(user: user_a, friend: user_b)
+      Friendship.create(user: user_b, friend: user_a)
+
+      expect(user_a.friends).to eq([user_b])
+      expect(user_b.friends).to eq([user_a])
     end
   end
 end

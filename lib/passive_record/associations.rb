@@ -9,16 +9,14 @@ module PassiveRecord
       @associations ||= []
     end
 
-    def belongs_to(parent_name_sym)
-      target_class_name = (parent_name_sym.to_s).split('_').map(&:capitalize).join
+    def belongs_to(parent_name_sym, opts={})
+      target_class_name = opts.delete(:class_name) { (parent_name_sym.to_s).split('_').map(&:capitalize).join }
       association = BelongsToAssociation.new(self, target_class_name, parent_name_sym)
       associations.push(association)
     end
 
     def has_one(child_name_sym)
       child_class_name = (child_name_sym.to_s).split('_').map(&:capitalize).join
-      # target_class = Object.const_get(target_class_name)
-
       association = HasOneAssociation.new(self, child_class_name, child_name_sym)
       associations.push(association)
     end

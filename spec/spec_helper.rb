@@ -42,3 +42,15 @@ class Doctor < Model
 end
 
 ###
+#
+# self-referential case
+#
+class Friendship < Model
+  belongs_to :user
+  belongs_to :friend, class_name: "User"
+end
+
+class User < Model
+  has_many :friendships
+  has_many :friends, :through => :friendships
+end
