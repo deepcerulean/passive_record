@@ -8,7 +8,6 @@ module PassiveRecord
 
       def target_name_symbol
         child_name_sym
-        # child_class_name
       end
     end
 

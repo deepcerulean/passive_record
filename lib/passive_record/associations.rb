@@ -25,13 +25,11 @@ module PassiveRecord
 
     def has_many(collection_name_sym, opts={})
       target_class_name = (collection_name_sym.to_s).split('_').map(&:capitalize).join
-      # target_class = Object.const_get(target_class_name.singularize)
 
       if opts.key?(:through)
         through_class_collection_name = opts.delete(:through)
 
         through_class_name = (through_class_collection_name.to_s).split('_').map(&:capitalize).join
-        # through_class = Object.const_get(through_class_name.singularize)
         base_association = associations.detect { |assn| assn.child_class_name == through_class_name }
 
         association = HasManyThroughAssociation.new(self, target_class_name, collection_name_sym, through_class_collection_name, base_association)

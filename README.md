@@ -57,11 +57,12 @@ PassiveRecord may be right for you.
     dog = child.create_dog
 
     # inverse relationships
-    dog.child # ==> child
+    dog.child # ===> dog
+
+    Child.find_by(child_id: dog.child_id) # ===> dog
 
     # has many thru
     parent.dogs # ==> [dog]
- 
 
 ## Requirements
 
