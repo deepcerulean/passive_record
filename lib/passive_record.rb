@@ -6,6 +6,7 @@ require 'passive_record/core/identifier'
 require 'passive_record/core/query'
 
 require 'passive_record/associations'
+require 'passive_record/hooks'
 
 module PassiveRecord
   def self.included(base)
@@ -52,6 +53,7 @@ module PassiveRecord
   module ClassMethods
     include PassiveRecord::Core
     include PassiveRecord::Associations
+    include PassiveRecord::Hooks
 
     include Enumerable
     extend Forwardable
@@ -76,17 +78,21 @@ module PassiveRecord
     end
 
     def create(attrs={})
-      registrable = new #(*args)
+      instance = new
 
-      registrable.singleton_class.class_eval { attr_accessor :id }
-      registrable.send(:"id=", Identifier.generate)
-      register(registrable)
+      instance.singleton_class.class_eval { attr_accessor :id }
+      instance.send(:"id=", Identifier.generate)
+      register(instance)
 
       attrs.each do |(k,v)|
-        registrable.send("#{k}=", v)
+        instance.send("#{k}=", v)
       end
 
-      registrable
+      after_create_hooks.each do |hook|
+        hook.run(instance)
+      end
+
+      instance
     end
 
     protected

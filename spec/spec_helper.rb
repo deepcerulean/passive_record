@@ -17,11 +17,19 @@ end
 class Child < Model
   has_one :dog
   belongs_to :parent
+
+  after_create :give_name
+
+  attr_reader :name
+  def give_name; @name = "Alice" end
 end
 
 class Parent < Model
   has_many :children
   has_many :dogs, :through => :children
+
+  attr_reader :created_at
+  after_create { @created_at = Time.now }
 end
 
 ###

@@ -73,6 +73,7 @@ PassiveRecord may be right for you.
 
     $ gem install passive_record
 
+
 ## Synopsis
 
     $ passive_record
