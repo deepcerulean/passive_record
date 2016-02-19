@@ -29,14 +29,14 @@ describe Model do
     let(:another_child) { Child.create }
 
     it 'should create children' do
-      expect { child.create_dog }.to change { Dog.count }.by(1) #from(0).to(1)
+      expect { child.create_dog }.to change { Dog.count }.by(1)
       expect(child.dog).to eq(Dog.first)
     end
 
     it 'should have inverse relationships' do
-      dog = child.create_dog #dog.create
+      dog = child.create_dog
       expect(dog.child).to eq(child)
-      another_dog = another_child.create_dog #.create
+      another_dog = another_child.create_dog
       expect(another_dog.child).to eq(another_child)
     end
   end
@@ -66,7 +66,7 @@ describe Model do
     let(:child) { parent.create_child }
     subject(:dogs) { parent.dogs }
 
-    it 'should create children of children' do
+    it 'should collect children of children' do
       child.create_dog
       expect(dogs).to all(be_a(Dog))
       expect(dogs.first).to eq(child.dog)
@@ -86,7 +86,7 @@ describe Model do
       expect(doctor.patients).to eq([patient])
     end
   end
-  
+
   context 'self-referential many-to-many' do
     let!(:user_a) { User.create }
     let!(:user_b) { User.create }
