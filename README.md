@@ -8,13 +8,53 @@
 
 ## Description
 
-TODO: Description
+PassiveRecord is an extremely lightweight in-memory pseudo-relational algebra.
+
+We simplified subset of AR's interface in pure Ruby.
+
+Maybe you need to track objects by ID and look them up again,
+or look them up based on attributes, or even utilize some limited relational semantics,
+but have no real need for persistence.
 
 ## Features
+
+  - Just 'include PassiveRecord' to activate a PORO in the system
+  - New objects are tracked and assigned IDs
+  - Query on attributes and simple relations (belongs_to, has_one, has_many)
+  - No database required!
 
 ## Examples
 
     require 'passive_record'
+
+    class Model
+      include PassiveRecord
+    end
+
+    class Dog < Model
+      belongs_to :child
+    end
+    
+    class Child < Model
+      has_one :dog
+      belongs_to :parent
+    end
+    
+    class Parent < Model
+      has_many :children
+      has_many :dogs, :through => :children
+    end
+
+    # Let's create some models!
+    child = Child.create
+    dog = child.create_dog
+
+    # inverse relationships
+    dog.child # ==> child
+
+    parent = Parent.create
+    parent.dogs # ==> [dog]
+ 
 
 ## Requirements
 
