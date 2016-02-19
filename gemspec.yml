@@ -1,6 +1,6 @@
 name: passive_record
-summary: "TODO: Summary"
-description: "TODO: Description"
+summary: "no-persistence relational algebra"
+description: "lightweight in-memory simplified subset of AR"
 license: MIT
 authors: Joseph Weissman
 email: jweissman1986@gmail.com
