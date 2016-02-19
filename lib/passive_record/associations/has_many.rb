@@ -6,11 +6,9 @@ module PassiveRecord
       end
     end
 
-    class HasManyRelation < HasOneRelation #Struct.new(:association, :parent_model)
+    class HasManyRelation < HasOneRelation
       def lookup
         association.child_class.where(parent_model_id_field => parent_model.id).all
-        # return self if results.empty?
-        # results
       end
     end
   end

@@ -20,7 +20,7 @@ end
 
 class Parent < Model
   has_many :children
-  # has_many :dogs, :through => :children
+  has_many :dogs, :through => :children
 end
 
 ###
@@ -103,14 +103,15 @@ describe Model do
     end
   end
 
-  xcontext 'one-to-many through relationships' do
+  context 'one-to-many through relationships' do
     let(:parent) { Parent.create }
-    let(:child) { parent.children.create }
+    let(:child) { parent.create_child }
     subject(:dogs) { parent.dogs }
 
     it 'should create children of children' do
-      child.dog.create
-      expect(dogs.all).to all(be_a(Dog))
+      child.create_dog
+      expect(dogs).to all(be_a(Dog))
+      expect(dogs.first).to eq(child.dog)
     end
   end
 end

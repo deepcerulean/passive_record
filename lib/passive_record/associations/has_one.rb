@@ -12,7 +12,7 @@ module PassiveRecord
       end
 
       def create
-        model = association.child_class.create #(parent_model_id_field => parent_model.id)
+        model = association.child_class.create
         model.send(parent_model_id_field + "=", parent_model.id)
         model
       end
