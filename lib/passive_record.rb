@@ -15,7 +15,7 @@ module PassiveRecord
 
   module InstanceMethods
     def relationships
-      @relationships ||= self.class.associations.map do |assn|
+      @relata ||= self.class.associations.map do |assn|
         assn.to_relation(self)
       end
     end

@@ -1,10 +1,8 @@
 require 'rspec'
-require 'passive_record/version'
 require 'pry'
+require 'passive_record'
 
-include PassiveRecord
-
-class Model # < Struct.new(:foo)
+class Model
   include PassiveRecord
 end
 
@@ -25,4 +23,3 @@ class Parent < Model
   has_many :children
   has_many :dogs, :through => :children
 end
-

@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'passive_record'
+
 
 ###
 
