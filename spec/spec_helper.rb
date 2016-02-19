@@ -23,3 +23,22 @@ class Parent < Model
   has_many :children
   has_many :dogs, :through => :children
 end
+
+###
+
+class Patient < Model
+  has_many :appointments
+  has_many :doctors, :through => :appointments
+end
+
+class Appointment < Model
+  belongs_to :patient
+  belongs_to :doctor
+end
+
+class Doctor < Model
+  has_many :appointments
+  has_many :patients, :through => :appointments
+end
+
+###

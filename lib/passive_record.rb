@@ -23,6 +23,7 @@ module PassiveRecord
     def method_missing(meth, *args, &blk)
       matching_relation = relationships.detect do |relation|  # matching relation...
         meth == relation.association.target_name_symbol ||
+          meth.to_s == relation.association.target_name_symbol.to_s + "=" ||
           meth.to_s == relation.association.target_name_symbol.to_s + "_id" ||
           meth.to_s == relation.association.target_name_symbol.to_s + "_id=" ||
           meth.to_s == "create_" + relation.association.target_name_symbol.to_s || # + "_id="
@@ -34,6 +35,8 @@ module PassiveRecord
           matching_relation.parent_model_id
         elsif meth.to_s.end_with?("_id=")
           matching_relation.parent_model_id = args.first
+        elsif meth.to_s.end_with?("=")
+          matching_relation.parent_model_id = args.first.id
         elsif meth.to_s.start_with?("create_")
           matching_relation.create(*args)
         else
@@ -72,12 +75,16 @@ module PassiveRecord
       Query.new(self, conditions)
     end
 
-    def create(*args)
-      registrable = new(*args)
+    def create(attrs={})
+      registrable = new #(*args)
 
       registrable.singleton_class.class_eval { attr_accessor :id }
       registrable.send(:"id=", Identifier.generate)
       register(registrable)
+
+      attrs.each do |(k,v)|
+        registrable.send("#{k}=", v)
+      end
 
       registrable
     end

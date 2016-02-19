@@ -1,28 +1,8 @@
 require 'spec_helper'
 
-
-###
-
-# class Patient < Model
-#   has_many :appointments
-#   has_many :doctors, :through => :appointments
-# end
-# 
-# class Appointment < Model
-#   belongs_to :patient
-#   belongs_to :doctor
-# end
-# 
-# class Doctor < Model
-#   has_many :appointments
-#   has_many :patients, :through => :appointments
-# end
-
-###
-
 describe Model do
   describe "with a simple model including PR" do
-    let!(:model) { SimpleModel.create(value) }
+    let!(:model) { SimpleModel.create(foo: value) }
     let(:value) { 'foo_value' }
 
     describe "#id" do
@@ -90,6 +70,19 @@ describe Model do
       child.create_dog
       expect(dogs).to all(be_a(Dog))
       expect(dogs.first).to eq(child.dog)
+    end
+  end
+
+  context 'many-to-many' do
+    let(:patient) { Patient.create }
+    let(:doctor)  { Doctor.create }
+    let!(:appointment) { Appointment.create(patient: patient, doctor: doctor) }
+
+    it 'should manage many-to-many relations' do
+      expect(appointment.doctor).to eq(doctor)
+      expect(appointment.patient).to eq(patient)
+      expect(patient.doctors).to eq([doctor])
+      expect(doctor.patients).to eq([patient])
     end
   end
 end

@@ -16,29 +16,29 @@ module PassiveRecord
     end
 
     def has_one(child_name_sym)
-      target_class_name = (child_name_sym.to_s).split('_').map(&:capitalize).join
-      target_class = Object.const_get(target_class_name)
+      child_class_name = (child_name_sym.to_s).split('_').map(&:capitalize).join
+      # target_class = Object.const_get(target_class_name)
 
-      association = HasOneAssociation.new(self, target_class, child_name_sym)
+      association = HasOneAssociation.new(self, child_class_name, child_name_sym)
       associations.push(association)
     end
 
     def has_many(collection_name_sym, opts={})
       target_class_name = (collection_name_sym.to_s).split('_').map(&:capitalize).join
-      target_class = Object.const_get(target_class_name.singularize)
+      # target_class = Object.const_get(target_class_name.singularize)
 
       if opts.key?(:through)
         through_class_collection_name = opts.delete(:through)
 
         through_class_name = (through_class_collection_name.to_s).split('_').map(&:capitalize).join
-        through_class = Object.const_get(through_class_name.singularize)
-        base_association = associations.detect { |assn| assn.child_class == through_class }
+        # through_class = Object.const_get(through_class_name.singularize)
+        base_association = associations.detect { |assn| assn.child_class_name == through_class_name }
 
-        association = HasManyThroughAssociation.new(self, target_class, collection_name_sym, through_class_collection_name, base_association)
+        association = HasManyThroughAssociation.new(self, target_class_name, collection_name_sym, through_class_collection_name, base_association)
 
         associations.push(association)
       else # simple has-many
-        association = HasManyAssociation.new(self, target_class, collection_name_sym)
+        association = HasManyAssociation.new(self, target_class_name, collection_name_sym)
         associations.push(association)
       end
     end
