@@ -1,0 +1,16 @@
+name: passive_record
+summary: "TODO: Summary"
+description: "TODO: Description"
+license: MIT
+authors: Joseph Weissman
+email: jweissman1986@gmail.com
+homepage: https://rubygems.org/gems/passive_record
+
+development_dependencies:
+  bundler: ~> 1.10
+  codeclimate-test-reporter: ~> 0.1
+  cucumber: ~> 0.10.2
+  rake: ~> 10.0
+  rspec: ~> 3.0
+  rubygems-tasks: ~> 0.2
+  yard: ~> 0.8
