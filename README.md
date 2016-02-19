@@ -15,7 +15,8 @@ We implement a simplified subset of AR's interface in pure Ruby.
 ## Why?
 
 Do you need to track objects by ID and look them up again,
-or look them up based on attributes, or even utilize some limited relational semantics,
+or look them up based on attributes,
+or even utilize some relational semantics,
 but have no real need for persistence?
 
 PassiveRecord may be right for you.
@@ -23,10 +24,12 @@ PassiveRecord may be right for you.
 
 ## Features
 
-  - Just 'include PassiveRecord' to activate a PORO in the system
   - New objects are tracked and assigned IDs
-  - Query on attributes and simple relations (belongs_to, has_one, has_many)
+  - Build relationships with belongs_to, has_one and has_many
+  - Query on attributes and associations
+  - Supports many-to-many and self-referential relationships
   - No database required!
+  - Just `include PassiveRecord` to activate a PORO in the system
 
 ## Examples
 
