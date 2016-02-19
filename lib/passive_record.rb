@@ -24,20 +24,21 @@ module PassiveRecord
       matching_relation = relationships.detect do |relation|  # matching relation...
         meth == relation.association.target_name_symbol ||
           meth.to_s == relation.association.target_name_symbol.to_s + "_id" ||
-          meth.to_s == relation.association.target_name_symbol.to_s + "_id="
+          meth.to_s == relation.association.target_name_symbol.to_s + "_id=" ||
+          meth.to_s == "create_" + relation.association.target_name_symbol.to_s || # + "_id="
+          meth.to_s == "create_" + (relation.association.target_name_symbol.to_s).singularize # + "_id="
       end
-
-      # binding.pry
 
       if matching_relation
         if meth.to_s.end_with?("_id")
           matching_relation.parent_model_id
         elsif meth.to_s.end_with?("_id=")
           matching_relation.parent_model_id = args.first
+        elsif meth.to_s.start_with?("create_")
+          matching_relation.create(*args)
         else
-          # binding.pry
-          # invoke the matching relation
-          matching_relation.lookup || matching_relation
+          # lookup the matching associated entities
+          matching_relation.lookup
         end
       else
         super(meth,*args,&blk)
