@@ -5,20 +5,27 @@ require 'passive_record/associations/has_many_through'
 
 module PassiveRecord
   module Associations
-    def associations
-      @associations ||= []
-    end
+    # def associations
+    #   @associations ||= []
+    # end
 
     def belongs_to(parent_name_sym, opts={})
       target_class_name = opts.delete(:class_name) { (parent_name_sym.to_s).split('_').map(&:capitalize).join }
       association = BelongsToAssociation.new(self, target_class_name, parent_name_sym)
-      associations.push(association)
+
+      @associations ||= []
+      @associations += [association]
+
+      # associations.push(association)
     end
 
     def has_one(child_name_sym)
       child_class_name = (child_name_sym.to_s).split('_').map(&:capitalize).join
       association = HasOneAssociation.new(self, child_class_name, child_name_sym)
-      associations.push(association)
+      
+      @associations ||= []
+      @associations += [association]
+      # associations.push(association)
     end
 
     def has_many(collection_name_sym, opts={})
@@ -32,10 +39,16 @@ module PassiveRecord
 
         association = HasManyThroughAssociation.new(self, target_class_name, collection_name_sym, through_class_collection_name, base_association)
 
-        associations.push(association)
+        # associations.push(association)
+
+        @associations ||= []
+        @associations += [association]
       else # simple has-many
         association = HasManyAssociation.new(self, target_class_name, collection_name_sym)
-        associations.push(association)
+        # associations.push(association)
+        #
+        @associations ||= []
+        @associations += [association]
       end
     end
   end

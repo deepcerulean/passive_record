@@ -4,6 +4,8 @@ require 'passive_record'
 
 class Model
   include PassiveRecord
+  attr_reader :created_at
+  after_create { @created_at = Time.now }
 end
 
 class SimpleModel < Struct.new(:foo)
@@ -11,7 +13,9 @@ class SimpleModel < Struct.new(:foo)
 end
 
 class Dog < Model
+  attr_reader :sound
   belongs_to :child
+  after_create {@sound = 'bark'}
 end
 
 class Child < Model
@@ -28,9 +32,6 @@ end
 class Parent < Model
   has_many :children
   has_many :dogs, :through => :children
-
-  attr_reader :created_at
-  after_create { @created_at = Time.now }
 end
 
 ###

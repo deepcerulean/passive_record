@@ -1,5 +1,6 @@
 require 'active_support'
 require 'active_support/core_ext/string/inflections'
+# require 'active_support/core_ext/class/attrs'
 
 require 'passive_record/version'
 require 'passive_record/core/identifier'
@@ -14,16 +15,16 @@ require 'passive_record/hooks'
 module PassiveRecord
   def self.included(base)
     base.send :include, InstanceMethods
-    # include ClassLevelInheritableAttributes
-    # base.send :include, ClassLevelInheritableAttributes
+    base.send :include, ClassLevelInheritableAttributes
+
+    base.class_eval do
+      inheritable_attrs :hooks, :associations
+    end
+
     base.extend(ClassMethods)
   end
 
   module InstanceMethods
-    include ClassLevelInheritableAttributes
-
-    inheritable_attributes :relata, :hooks
-
     def relationships
       @relata ||= self.class.associations.map do |assn|
         assn.to_relation(self)
@@ -64,14 +65,18 @@ module PassiveRecord
     include PassiveRecord::Associations
     include PassiveRecord::Hooks
 
+
     include Enumerable
     extend Forwardable
-
 
     def all
       instances_by_id.values
     end
     def_delegators :all, :each
+
+    def last
+      all.last
+    end
 
     def find_by(conditions)
       if conditions.is_a?(Identifier)

@@ -37,6 +37,10 @@ describe Model do
       end
 
       it 'should use a block' do
+        expect(Dog.create.sound).to eq("bark")
+      end
+
+      it 'should use an inherited block' do
         expect(Parent.create.created_at).to be_a(Time)
       end
     end
@@ -49,7 +53,7 @@ describe Model do
 
       it 'should create children' do
         expect { child.create_dog }.to change { Dog.count }.by(1)
-        expect(child.dog).to eq(Dog.first)
+        expect(child.dog).to eq(Dog.last)
       end
 
       it 'should have inverse relationships' do

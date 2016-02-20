@@ -5,7 +5,7 @@ module ClassLevelInheritableAttributes
   end
 
   module ClassMethods
-    def inheritable_attributes(*args)
+    def inheritable_attrs(*args)
       @inheritable_attributes ||= [:inheritable_attributes]
       @inheritable_attributes += args
       args.each do |arg|
@@ -13,6 +13,8 @@ module ClassLevelInheritableAttributes
           class << self; attr_accessor :#{arg} end
         )
       end
+
+      # binding.pry
       @inheritable_attributes
     end
 
