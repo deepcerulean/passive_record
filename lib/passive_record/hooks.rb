@@ -1,5 +1,6 @@
 module PassiveRecord
   module Hooks
+
     class Hook
       def initialize(*meth_syms,&blk)
         @methods_to_call = meth_syms

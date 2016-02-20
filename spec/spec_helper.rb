@@ -18,9 +18,10 @@ class Child < Model
   has_one :dog
   belongs_to :parent
 
+  attr_reader :name
+
   after_create :give_name
 
-  attr_reader :name
   def give_name; @name = "Alice" end
 end
 

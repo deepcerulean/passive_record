@@ -5,16 +5,25 @@ require 'passive_record/version'
 require 'passive_record/core/identifier'
 require 'passive_record/core/query'
 
+# should also be the same...?
 require 'passive_record/associations'
+
+require 'passive_record/class_inheritable_attrs'
 require 'passive_record/hooks'
 
 module PassiveRecord
   def self.included(base)
     base.send :include, InstanceMethods
+    # include ClassLevelInheritableAttributes
+    # base.send :include, ClassLevelInheritableAttributes
     base.extend(ClassMethods)
   end
 
   module InstanceMethods
+    include ClassLevelInheritableAttributes
+
+    inheritable_attributes :relata, :hooks
+
     def relationships
       @relata ||= self.class.associations.map do |assn|
         assn.to_relation(self)
@@ -57,6 +66,7 @@ module PassiveRecord
 
     include Enumerable
     extend Forwardable
+
 
     def all
       instances_by_id.values
