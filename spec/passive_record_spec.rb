@@ -53,7 +53,7 @@ describe Model do
 
       it 'should create children' do
         expect { child.create_dog }.to change { Dog.count }.by(1)
-        expect(child.dog).to eq(Dog.last)
+        expect(child.dogs.first).to eq(Dog.last)
       end
 
       it 'should have inverse relationships' do
@@ -92,7 +92,7 @@ describe Model do
       it 'should collect children of children' do
         child.create_dog
         expect(dogs).to all(be_a(Dog))
-        expect(dogs.first).to eq(child.dog)
+        expect(dogs.first).to eq(child.dogs.first)
       end
     end
 

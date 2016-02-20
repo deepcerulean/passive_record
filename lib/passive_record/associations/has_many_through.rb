@@ -8,10 +8,22 @@ module PassiveRecord
 
     class HasManyThroughRelation < HasManyRelation
       def lookup
-        association.base_association.
+        intermediate_results = association.base_association.
           to_relation(parent_model).
-          lookup.
-          flat_map(&association.target_name_symbol.to_s.singularize.to_sym)
+          lookup
+
+        singular_target_sym = association.target_name_symbol.to_s.singularize.to_sym
+        plural_target_sym   = association.target_name_symbol.to_s.pluralize.to_sym
+
+        if !intermediate_results.empty?
+          if intermediate_results.first.respond_to?(singular_target_sym)
+            intermediate_results.flat_map(&singular_target_sym)
+          elsif intermediate_results.first.respond_to?(plural_target_sym)
+            intermediate_results.flat_map(&plural_target_sym)
+          end
+        else
+          []
+        end
       end
 
       def create(attrs={})

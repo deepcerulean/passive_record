@@ -1,15 +1,13 @@
 require 'active_support'
 require 'active_support/core_ext/string/inflections'
-# require 'active_support/core_ext/class/attrs'
 
 require 'passive_record/version'
 require 'passive_record/core/identifier'
 require 'passive_record/core/query'
 
-# should also be the same...?
-require 'passive_record/associations'
-
 require 'passive_record/class_inheritable_attrs'
+
+require 'passive_record/associations'
 require 'passive_record/hooks'
 
 module PassiveRecord
@@ -25,14 +23,14 @@ module PassiveRecord
   end
 
   module InstanceMethods
-    def relationships
+    def relata
       @relata ||= self.class.associations.map do |assn|
         assn.to_relation(self)
       end
     end
 
-    def method_missing(meth, *args, &blk)
-      matching_relation = relationships.detect do |relation|  # matching relation...
+    def find_relation_by_target_name_symbol(meth)
+      relata.detect do |relation|  # matching relation...
         meth == relation.association.target_name_symbol ||
           meth.to_s == relation.association.target_name_symbol.to_s + "=" ||
           meth.to_s == relation.association.target_name_symbol.to_s + "_id" ||
@@ -40,9 +38,23 @@ module PassiveRecord
           meth.to_s == "create_" + relation.association.target_name_symbol.to_s ||
           meth.to_s == "create_" + (relation.association.target_name_symbol.to_s).singularize
       end
+    end
+
+
+    def respond_to?(meth,*args,&blk)
+      if find_relation_by_target_name_symbol(meth)
+        true
+      else
+        super(meth,*args,&blk)
+      end
+    end
+
+
+    def method_missing(meth, *args, &blk)
+      matching_relation = find_relation_by_target_name_symbol(meth)
 
       if matching_relation
-        if meth.to_s.end_with?("_id")
+        if meth.to_s == matching_relation.association.target_name_symbol.to_s + "_id" #end_with?("_id")
           matching_relation.parent_model_id
         elsif meth.to_s.end_with?("_id=")
           matching_relation.parent_model_id = args.first
