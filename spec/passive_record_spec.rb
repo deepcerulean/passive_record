@@ -25,7 +25,17 @@ describe Model do
           expect(SimpleModel.find_by(foo: 'foo_value')).to eq(model)
         end
 
-        xit 'should support nested queries'
+        xit 'should support nested queries' do
+          post = Post.create
+          user = User.create
+          
+          comment = post.create_comment(user: user)
+          #  ...  = user.create_comment post: post
+
+          posts_with_comments_by_user = Post.find_by comments: { user: user }
+
+          expect(posts_with_comments_by_user).to eq([comment])
+        end
       end
     end
   end

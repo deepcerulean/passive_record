@@ -63,3 +63,18 @@ class User < Model
   has_many :friendships
   has_many :friends, :through => :friendships
 end
+
+### 
+
+class Post < Model
+  has_many :comments 
+end
+
+class User < Model
+  has_many :comments
+end
+
+class Comment < Model
+  belongs_to :post
+  belongs_to :user
+end
