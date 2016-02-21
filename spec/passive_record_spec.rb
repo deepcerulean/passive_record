@@ -24,6 +24,8 @@ describe Model do
         it 'should be retrievable by query' do
           expect(SimpleModel.find_by(foo: 'foo_value')).to eq(model)
         end
+
+        xit 'should support nested queries'
       end
     end
   end
