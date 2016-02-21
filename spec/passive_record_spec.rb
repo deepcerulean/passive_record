@@ -55,11 +55,17 @@ describe Model do
       describe "#find" do
         subject(:model) {  SimpleModel.create }
         it 'should lookup a record based on an identifier' do
+          expect(SimpleModel.find(-1)).to eq(nil)
           expect(SimpleModel.find(model.id)).to eq(model)
         end
 
         it 'should lookup records based on primary key value' do
           expect(SimpleModel.find(model.id.value)).to eq(model)
+        end
+
+        it 'should lookup records based on ids' do
+          model_b = SimpleModel.create
+          expect(SimpleModel.find([model.id, model_b.id])).to eq([model, model_b])
         end
       end
     end

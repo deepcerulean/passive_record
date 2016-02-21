@@ -45,7 +45,7 @@ module PassiveRecord
       Hash[
         instance_variables.
           reject { |sym| sym.to_s.start_with?("@_") }.
-          map { |name| [name, instance_variable_get(name)] } 
+          map { |name| [name, instance_variable_get(name)] }
       ]
     end
 
@@ -181,7 +181,6 @@ module PassiveRecord
     def find_by_ids(ids)
       instances_by_id.select { |id,_| ids.include?(id) }.values
     end
-
 
     private
     def instances_by_id
