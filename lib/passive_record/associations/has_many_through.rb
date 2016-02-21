@@ -24,25 +24,22 @@ module PassiveRecord
       end
 
       def target_sym
-        singular_target_sym = association.target_name_symbol.to_s.singularize.to_sym
-        plural_target_sym   = association.target_name_symbol.to_s.pluralize.to_sym
-        has_child_class = begin child_class rescue false end
-        if has_child_class
-          singular_class_name_sym = child_class.name.split('::').last.to_s.underscore.singularize.to_sym
-          plural_class_name_sym = child_class.name.split('::').last.to_s.underscore.pluralize.to_sym
-        end
+        name_str = association.target_name_symbol.to_s
+        singular_target_sym = name_str.singularize.to_sym
+        plural_target_sym   = name_str.pluralize.to_sym
+
+        singular_class_name_sym = association.child_class_name.underscore.singularize.to_sym
+        plural_class_name_sym = association.child_class_name.underscore.pluralize.to_sym
 
         if !results.empty?
           if results.first.respond_to?(singular_target_sym)
             singular_target_sym
           elsif results.first.respond_to?(plural_target_sym)
             plural_target_sym
-          elsif has_child_class
-            if results.first.respond_to?(singular_class_name_sym)
-              singular_class_name_sym
-            elsif results.first.respond_to?(plural_class_name_sym)
-              plural_class_name_sym
-            end
+          elsif results.first.respond_to?(singular_class_name_sym)
+            singular_class_name_sym
+          elsif results.first.respond_to?(plural_class_name_sym)
+            plural_class_name_sym
           end
         end
       end

@@ -35,17 +35,18 @@ describe Model do
       end
     end
 
-    describe "#create" do 
+    describe "#create" do
       it 'should assign attributes' do
         expect(model.foo).to eq('foo_value')
       end
     end
 
     describe "#destroy_all" do
-      before { 
-        SimpleModel.create(foo: 'val')
-        SimpleModel.create(foo: 'val')
+      before {
+        SimpleModel.create(foo: 'val1')
+        SimpleModel.create(foo: 'val2')
       }
+
       it 'should remove all models' do
         expect { SimpleModel.destroy_all }.to change { SimpleModel.count }.by(-SimpleModel.count)
       end
@@ -182,7 +183,7 @@ describe Model do
         expect(parent.toys.count).to eq(1)
         expect(parent.toys.first).to eq(child.toy)
       end
-      
+
       it 'should attempt to construct intermediary relations' do
         expect { parent.create_toy(child: child) }.to change {Toy.count}.by(1)
         expect(Toy.last.child).to eq(child)
