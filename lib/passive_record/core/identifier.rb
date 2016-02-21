@@ -6,7 +6,7 @@ module PassiveRecord
     end
 
     def ==(other_id)
-      self.value == other_id.value
+      self.value == other_id.value rescue self.value == other_id
     end
 
     def inspect

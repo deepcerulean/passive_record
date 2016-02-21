@@ -51,6 +51,19 @@ describe Model do
       end
     end
 
+    context 'querying by id' do
+      describe "#find" do
+        subject(:model) {  SimpleModel.create }
+        it 'should lookup a record based on an identifier' do
+          expect(SimpleModel.find(model.id)).to eq(model)
+        end
+
+        it 'should lookup records based on primary key value' do
+          expect(SimpleModel.find(model.id.value)).to eq(model)
+        end
+      end
+    end
+
     context 'querying by attributes' do
       describe "#find_by" do
         it 'should be retrievable by query' do

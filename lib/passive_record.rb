@@ -42,11 +42,15 @@ module PassiveRecord
 
     # from http://stackoverflow.com/a/8417341/90042
     def instance_variables_hash
-      Hash[instance_variables.map { |name| [name, instance_variable_get(name)] } ]
+      Hash[
+        instance_variables.
+          reject { |sym| sym.to_s.start_with?("@_") }.
+          map { |name| [name, instance_variable_get(name)] } 
+      ]
     end
 
     def relata
-      @relata ||= self.class.associations.map do |assn|
+      @_relata ||= self.class.associations.map do |assn|
         assn.to_relation(self)
       end
     end
@@ -169,8 +173,9 @@ module PassiveRecord
     end
 
     protected
-    def find_by_id(id)
-      instances_by_id[id]
+    def find_by_id(_id)
+      key = instances_by_id.keys.detect { |id,_| id == _id }
+      instances_by_id[key] if key
     end
 
     def find_by_ids(ids)

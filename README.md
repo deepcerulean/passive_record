@@ -36,6 +36,7 @@ PassiveRecord may be right for you!
 
 ## Examples
 
+````ruby
     require 'passive_record'
 
     class Model
@@ -58,20 +59,29 @@ PassiveRecord may be right for you!
 
     # Let's create some models!
     parent = Parent.create
+    => Parent (id: 1)
 
     child = parent.create_child
+    => Child (id: 1)
+
     dog = child.create_dog
+    => Dog (id: 1)
 
     # inverse relationships
-    dog.child # ===> dog
+    dog.child
+    => Child (id: 1)
 
-    Dog.find_by(child: child) # ===> dog
+    Dog.find_by child: child
+    => Dog (id: 1)
 
     # has many thru
-    parent.dogs # ==> [dog]
+    parent.dogs
+    => [Dog (id: 1)]
 
     # nested queries
-    Dog.find_all_by(child: { parent: parent }) # => [dog]
+    Dog.find_all_by(child: { parent: parent })
+    => [Dog (id: 1)]
+````
 
 ## Requirements
 
