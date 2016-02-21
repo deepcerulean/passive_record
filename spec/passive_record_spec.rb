@@ -24,6 +24,32 @@ describe Model do
         it 'should be retrievable by query' do
           expect(SimpleModel.find_by(foo: 'foo_value')).to eq(model)
         end
+
+        context 'nested queries' do
+          let(:post) { Post.create }
+          let(:user) { User.create }
+
+          subject(:posts_with_comments_by_user) do
+            Post.find_by comments: { user: user }
+          end
+
+          before do
+            post.create_comment(user: user)
+          end
+
+          it 'should find a single record through a nested query' do
+            post = Post.find_by comments: { user: user }
+            expect(post).to eq(post)
+          end
+
+          it 'should find multiple records through a nested query' do
+            another_post = Post.create
+            another_post.create_comment(user: user)
+
+            posts = Post.find_all_by comments: { user: user }
+            expect(posts).to eq([post,another_post])
+          end
+        end
       end
     end
   end

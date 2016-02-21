@@ -19,7 +19,7 @@ or look them up based on attributes,
 or even utilize some relational semantics,
 but have no real need for persistence?
 
-PassiveRecord may be right for you.
+PassiveRecord may be right for you!
 
 
 ## Features
