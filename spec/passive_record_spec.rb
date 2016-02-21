@@ -157,6 +157,7 @@ describe Model do
 
         expect(child.id).not_to eq(another_child.id)
         expect(parent.children).to eq([child, another_child])
+        expect(parent.children_ids).to eq([child.id, another_child.id])
       end
     end
 
@@ -169,6 +170,7 @@ describe Model do
         expect(parent.dogs).to all(be_a(Dog))
         expect(parent.dogs.count).to eq(1)
         expect(parent.dogs.first).to eq(child.dogs.first)
+        expect(parent.dog_ids).to eq([child.dogs.first.id])
       end
 
       it 'should do the nested query example from the readme' do
