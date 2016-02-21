@@ -1,5 +1,21 @@
 require 'spec_helper'
 
+describe PassiveRecord do
+  describe ".drop_all" do
+    it 'should remove all records' do
+      SimpleModel.create
+      Post.create
+      10.times { Doctor.create }
+
+      PassiveRecord.drop_all
+
+      expect(SimpleModel.count).to eq(0)
+      expect(Post.count).to eq(0)
+      expect(Doctor.count).to eq(0)
+    end
+  end
+end
+
 describe Model do
   describe "with a simple model including PR" do
     let!(:model) { SimpleModel.create(foo: value) }
@@ -16,6 +32,22 @@ describe Model do
         it 'should indicate the size of the models list' do
           expect { SimpleModel.create }.to change { SimpleModel.count }.by(1)
         end
+      end
+    end
+
+    describe "#create" do 
+      it 'should assign attributes' do
+        expect(model.foo).to eq('foo_value')
+      end
+    end
+
+    describe "#destroy_all" do
+      before { 
+        SimpleModel.create(foo: 'val')
+        SimpleModel.create(foo: 'val')
+      }
+      it 'should remove all models' do
+        expect { SimpleModel.destroy_all }.to change { SimpleModel.count }.by(-SimpleModel.count)
       end
     end
 

@@ -20,6 +20,16 @@ module PassiveRecord
     end
 
     base.extend(ClassMethods)
+
+    model_classes << base
+  end
+
+  def self.model_classes
+    @model_classes ||= []
+  end
+
+  def self.drop_all
+    (model_classes + model_classes.flat_map(&:descendants)).each(&:destroy_all)
   end
 
   module InstanceMethods
@@ -40,6 +50,7 @@ module PassiveRecord
         assn.to_relation(self)
       end
     end
+
 
     def find_relation_by_target_name_symbol(meth)
       relata.detect do |relation|  # matching relation...
@@ -87,9 +98,13 @@ module PassiveRecord
     include PassiveRecord::Associations
     include PassiveRecord::Hooks
 
-
     include Enumerable
     extend Forwardable
+
+    # from http://stackoverflow.com/a/2393750/90042
+    def descendants
+      ObjectSpace.each_object(Class).select { |klass| klass < self }
+    end
 
     def all
       instances_by_id.values
@@ -147,6 +162,10 @@ module PassiveRecord
       end
 
       instance
+    end
+
+    def destroy_all
+      @instances = {}
     end
 
     protected
