@@ -4,7 +4,9 @@
 * [Documentation](http://rubydoc.info/gems/passive_record/frames)
 * [Email](mailto:jweissman1986 at gmail.com)
 
-[![Code Climate GPA](https://codeclimate.com/github//passive_record/badges/gpa.svg)](https://codeclimate.com/github//passive_record)
+[![Code Climate GPA](https://codeclimate.com/github/deepcerulean/passive_record/badges/gpa.svg)](https://codeclimate.com/github//passive_record)
+[![Codeship Status for deepcerulean/passive_record](https://www.codeship.io/projects/66bb2d90-ba61-0133-af95-025ac38368ea/status)](https://codeship.com/projects/128700)
+
 
 ## Description
 
