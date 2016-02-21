@@ -23,6 +23,9 @@ module PassiveRecord
   end
 
   module InstanceMethods
+    def inspect
+      self.class.name + "(#{id.inspect})"
+    end
     def relata
       @relata ||= self.class.associations.map do |assn|
         assn.to_relation(self)
@@ -136,6 +139,7 @@ module PassiveRecord
     def find_by_ids(ids)
       instances_by_id.select { |id,_| ids.include?(id) }.values
     end
+
 
     private
     def instances_by_id

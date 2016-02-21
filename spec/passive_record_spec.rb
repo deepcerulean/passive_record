@@ -111,16 +111,18 @@ describe Model do
     context 'one-to-many through relationships' do
       let(:parent) { Parent.create }
       let(:child) { parent.create_child }
-      subject(:dogs) { parent.dogs }
 
       it 'should collect children of children' do
         child.create_dog
-        expect(dogs).to all(be_a(Dog))
-        expect(dogs.count).to eq(1)
-        expect(dogs.first).to eq(child.dogs.first)
+        expect(parent.dogs).to all(be_a(Dog))
+        expect(parent.dogs.count).to eq(1)
+        expect(parent.dogs.first).to eq(child.dogs.first)
+      end
 
-        # readme example
-        expect(Dog.find_all_by(child: {parent:parent})).to eq(dogs)
+      it 'should do the nested query example from the readme' do
+        child.create_dog
+        expect(Dog.find_all_by(child: {parent: parent})).
+          to eq(parent.dogs)
       end
     end
 
