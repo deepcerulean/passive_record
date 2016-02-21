@@ -4,7 +4,18 @@ module PassiveRecord
       def all
         klass.all.select do |instance|
           conditions.all? do |(field,value)|
-            instance.send(field) == value
+            if value.is_a?(Hash)
+              assn = instance.send(field)
+              matched = assn && value.all? do |(assn_field,val)|
+                assn.any? do |assc_model|
+                  assc_model.send(assn_field) == val
+                end
+              end
+
+              matched
+            else
+              instance.send(field) == value
+            end
           end
         end
       end
