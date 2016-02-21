@@ -118,6 +118,7 @@ module PassiveRecord
 
       instance.singleton_class.class_eval { attr_accessor :id }
       instance.send(:"id=", Identifier.generate)
+
       register(instance)
 
       attrs.each do |(k,v)|
