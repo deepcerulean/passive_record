@@ -4,6 +4,10 @@ module PassiveRecord
       new(SecureRandom.uuid)
     end
 
+    def ==(other_id)
+      self.value == other_id.value
+    end
+
     def inspect
       value
     end
