@@ -108,15 +108,15 @@ describe Model do
       let(:another_child) { Child.create }
 
       it 'should create children' do
-        expect { child.create_dog }.to change { Dog.count }.by(1)
-        expect(child.dogs.first).to eq(Dog.last)
+        expect { child.create_toy }.to change { Toy.count }.by(1)
+        expect(child.toy).to eq(Toy.last)
       end
 
       it 'should have inverse relationships' do
-        dog = child.create_dog
-        expect(dog.child).to eq(child)
-        another_dog = another_child.create_dog
-        expect(another_dog.child).to eq(another_child)
+        toy = child.create_toy
+        expect(toy.child).to eq(child)
+        another_toy = another_child.create_toy
+        expect(another_toy.child).to eq(another_child)
       end
     end
 
@@ -156,6 +156,14 @@ describe Model do
         expect(Dog.find_all_by(child: {parent: parent})).
           to eq(parent.dogs)
       end
+
+      it 'should work for has-one intermediary relationships' do
+        child.create_toy
+        expect(parent.toys).to all(be_a(Toy))
+        expect(parent.toys.count).to eq(1)
+        expect(parent.toys.first).to eq(child.toy)
+      end
+      
     end
 
     context 'many-to-many' do

@@ -21,7 +21,14 @@ class Dog < Model
   after_create {@sound = 'bark'}
 end
 
+class Toy < Model
+  belongs_to :child
+  attr_reader :kind
+  after_create {@kind = %w[ stuffed_animal blocks cards ].sample}
+end
+
 class Child < Model
+  has_one :toy
   has_many :dogs
   belongs_to :parent
 
@@ -34,6 +41,7 @@ end
 class Parent < Model
   has_many :children
   has_many :dogs, :through => :children
+  has_many :toys, :through => :children
 end
 
 ###
