@@ -79,6 +79,7 @@ end
 
 class Post < Model
   has_many :comments 
+  has_many :commenters, :through => :comments, :class_name => "User"
 end
 
 class User < Model

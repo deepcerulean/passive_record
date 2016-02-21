@@ -23,7 +23,7 @@ module PassiveRecord
     end
 
     def has_many(collection_name_sym, opts={})
-      target_class_name = (collection_name_sym.to_s).split('_').map(&:capitalize).join
+      target_class_name = opts.delete(:class_name) { (collection_name_sym.to_s).split('_').map(&:capitalize).join }
 
       if opts.key?(:through)
         through_class_collection_name = opts.delete(:through)

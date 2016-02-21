@@ -33,6 +33,7 @@ module PassiveRecord
       end
 
       def child_class
+        # binding.pry
         Object.const_get(association.child_class_name.singularize)
       end
     end

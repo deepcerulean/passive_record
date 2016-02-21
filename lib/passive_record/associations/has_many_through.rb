@@ -7,29 +7,48 @@ module PassiveRecord
     end
 
     class HasManyThroughRelation < HasManyRelation
+      def intermediary_relation
+        association.base_association.to_relation(parent_model)
+      end
+
+      def results
+        intermediary_relation.lookup
+      end
+
       def lookup
-        intermediate_results = association.base_association.
-          to_relation(parent_model).
-          lookup
-
-        singular_target_sym = association.target_name_symbol.to_s.singularize.to_sym
-        plural_target_sym   = association.target_name_symbol.to_s.pluralize.to_sym
-
-        if !intermediate_results.empty?
-          if intermediate_results.first.respond_to?(singular_target_sym)
-            intermediate_results.flat_map(&singular_target_sym)
-          elsif intermediate_results.first.respond_to?(plural_target_sym)
-            intermediate_results.flat_map(&plural_target_sym)
-          end
+        if target_sym && results
+          results.flat_map(&target_sym)
         else
           []
         end
       end
 
+      def target_sym
+        singular_target_sym = association.target_name_symbol.to_s.singularize.to_sym
+        plural_target_sym   = association.target_name_symbol.to_s.pluralize.to_sym
+        has_child_class = begin child_class rescue false end
+        if has_child_class
+          singular_class_name_sym = child_class.name.split('::').last.to_s.underscore.singularize.to_sym
+          plural_class_name_sym = child_class.name.split('::').last.to_s.underscore.pluralize.to_sym
+        end
+
+        if !results.empty?
+          if results.first.respond_to?(singular_target_sym)
+            singular_target_sym
+          elsif results.first.respond_to?(plural_target_sym)
+            plural_target_sym
+          elsif has_child_class
+            if results.first.respond_to?(singular_class_name_sym)
+              singular_class_name_sym
+            elsif results.first.respond_to?(plural_class_name_sym)
+              plural_class_name_sym
+            end
+          end
+        end
+      end
+
       def create(attrs={})
-        # binding.pry
-        raise "missing intermediate relational key #{association.through_class}" unless attrs.key?(association.through_class)
-        super(attrs)
+        child_class.create(attrs)
       end
     end
   end

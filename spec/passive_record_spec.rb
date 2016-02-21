@@ -183,6 +183,18 @@ describe Model do
         expect(parent.toys.first).to eq(child.toy)
       end
       
+      it 'should attempt to construct intermediary relations' do
+        expect { parent.create_toy(child: child) }.to change {Toy.count}.by(1)
+        expect(Toy.last.child).to eq(child)
+        expect(Toy.last.child.parent).to eq(parent)
+      end
+
+      it 'should accept class name' do
+        post = Post.create
+        user = User.create
+        Comment.create(post: post, user: user)
+        expect(post.commenters).to eq([user])
+      end
     end
 
     context 'many-to-many' do
