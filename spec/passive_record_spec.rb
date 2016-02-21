@@ -26,8 +26,6 @@ describe Model do
         end
       end
     end
-
-    xcontext 'querying by associations'
   end
 
   context 'hooks' do

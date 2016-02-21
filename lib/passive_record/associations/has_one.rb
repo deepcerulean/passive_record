@@ -22,7 +22,6 @@ module PassiveRecord
             parent_model_id_field => parent_model.id
           )
         )
-        # model.send(parent_model_id_field + "=", parent_model.id)
       end
 
       def parent_model_id_field

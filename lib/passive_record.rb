@@ -40,7 +40,6 @@ module PassiveRecord
       end
     end
 
-
     def respond_to?(meth,*args,&blk)
       if find_relation_by_target_name_symbol(meth)
         true
@@ -49,12 +48,11 @@ module PassiveRecord
       end
     end
 
-
     def method_missing(meth, *args, &blk)
       matching_relation = find_relation_by_target_name_symbol(meth)
 
       if matching_relation
-        if meth.to_s == matching_relation.association.target_name_symbol.to_s + "_id" #end_with?("_id")
+        if meth.to_s == matching_relation.association.target_name_symbol.to_s + "_id"
           matching_relation.parent_model_id
         elsif meth.to_s.end_with?("_id=")
           matching_relation.parent_model_id = args.first
