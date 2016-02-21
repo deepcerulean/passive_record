@@ -67,6 +67,9 @@ PassiveRecord may be right for you!
     # has many thru
     parent.dogs # ==> [dog]
 
+    # nested queries
+    Dog.find_all_by(child: { parent: parent }) # => [dog]
+
 ## Requirements
 
 ## Install

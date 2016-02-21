@@ -116,7 +116,11 @@ describe Model do
       it 'should collect children of children' do
         child.create_dog
         expect(dogs).to all(be_a(Dog))
+        expect(dogs.count).to eq(1)
         expect(dogs.first).to eq(child.dogs.first)
+
+        # readme example
+        expect(Dog.find_all_by(child: {parent:parent})).to eq(dogs)
       end
     end
 
