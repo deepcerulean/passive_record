@@ -24,8 +24,17 @@ module PassiveRecord
 
   module InstanceMethods
     def inspect
-      self.class.name + "(#{id.inspect})"
+      pretty_vars = instance_variables_hash.map do |k,v|
+        "#{k.to_s.gsub(/^\@/,'')}: #{v.inspect}"
+      end.join(', ')
+      "#{self.class.name} (#{pretty_vars})"
     end
+
+    # from http://stackoverflow.com/a/8417341/90042
+    def instance_variables_hash
+      Hash[instance_variables.map { |name| [name, instance_variable_get(name)] } ]
+    end
+
     def relata
       @relata ||= self.class.associations.map do |assn|
         assn.to_relation(self)
@@ -91,6 +100,14 @@ module PassiveRecord
       all.last
     end
 
+    def find(id_or_ids)
+      if id_or_ids.is_a?(Array)
+        find_by_ids(id_or_ids)
+      else
+        find_by_id(id_or_ids)
+      end
+    end
+
     def find_by(conditions)
       if conditions.is_a?(Identifier)
         find_by_id(conditions)
@@ -117,7 +134,7 @@ module PassiveRecord
       instance = new
 
       instance.singleton_class.class_eval { attr_accessor :id }
-      instance.send(:"id=", Identifier.generate)
+      instance.send(:"id=", Identifier.generate(self))
 
       register(instance)
 
