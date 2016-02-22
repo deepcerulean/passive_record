@@ -55,7 +55,7 @@ module PassiveRecord
       instance = new
 
       instance.singleton_class.class_eval { attr_accessor :id }
-      instance.send(:"id=", Identifier.generate(self))
+      instance.send(:"id=", id_factory.generate(self))
 
       register(instance)
 
@@ -75,8 +75,8 @@ module PassiveRecord
     end
 
     protected
-    def find_by_id(_id)
-      key = instances_by_id.keys.detect { |id,_| id == _id }
+    def find_by_id(id_to_find)
+      key = instances_by_id.keys.detect { |id,_| id == id_to_find }
       instances_by_id[key] if key
     end
 
@@ -93,6 +93,9 @@ module PassiveRecord
       instances_by_id[model.id] = model
       self
     end
-  end
 
+    def id_factory
+      PassiveRecord.configuration.identify_using
+    end
+  end
 end

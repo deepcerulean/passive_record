@@ -12,7 +12,7 @@ module PassiveRecord
 
     def method_missing(meth, *args, &blk)
       if (matching_relation = find_relation_by_target_name_symbol(meth))
-        send_relation(matching_relation, meth, *args, &blk)
+        send_relation(matching_relation, meth, *args)
       else
         super(meth,*args,&blk)
       end
@@ -20,7 +20,7 @@ module PassiveRecord
 
     protected
 
-    def send_relation(matching_relation, meth, *args, &blk)
+    def send_relation(matching_relation, meth, *args)
       target_name = matching_relation.association.target_name_symbol.to_s
 
       case meth.to_s

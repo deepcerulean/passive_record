@@ -23,7 +23,7 @@ describe Model do
 
     describe "#inspect" do
       it 'should report attribute details' do
-        expect(model.inspect).to eq("SimpleModel (id: 1, foo: \"foo_value\")")
+        expect(model.inspect).to eq("SimpleModel (id: #{model.id.inspect}, foo: \"foo_value\")")
       end
     end
 
@@ -257,5 +257,26 @@ describe Model do
       end
     end
   end
+end
 
+describe "configuration" do
+  describe 'configuring id factory' do
+    context 'with default config' do
+      it 'should generate simple identifiers' do
+        expect(Model.create.id).to be_a(PassiveRecord::Identifier)
+      end
+    end
+
+    context 'with a new id factory configured' do
+      before do
+        PassiveRecord.configure do |passive_records|
+          passive_records.identify_using = PassiveRecord::SecureRandomIdentifier
+        end
+      end
+
+      it 'should generate uuids' do
+        expect(Model.create.id).to be_a(PassiveRecord::SecureRandomIdentifier)
+      end
+    end
+  end
 end

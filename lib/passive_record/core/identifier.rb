@@ -1,8 +1,11 @@
 module PassiveRecord
   class Identifier < Struct.new(:value)
     def self.generate(klass)
-      new(klass.count+1)
-      # TODO maybe config to activate SecureRandom.uuid?
+      new(generate_id_value_for(klass))
+    end
+
+    def self.generate_id_value_for(klass)
+      klass.count+1
     end
 
     def ==(other_id)
@@ -11,6 +14,12 @@ module PassiveRecord
 
     def inspect
       value
+    end
+  end
+
+  class SecureRandomIdentifier < Identifier
+    def self.generate_id_value_for(*)
+      SecureRandom.uuid
     end
   end
 end
