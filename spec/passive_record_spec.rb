@@ -75,6 +75,27 @@ describe Model do
           expect(SimpleModel.find([model.id, model_b.id])).to eq([model, model_b])
         end
       end
+
+      describe "#where" do
+        it 'should return a query obj' do
+          expect(SimpleModel.where(id: 'fake_id')).to be_a(PassiveRecord::Core::Query)
+        end
+
+        context "queries" do
+          describe "#create" do
+          it 'should create objects' do
+            expect{SimpleModel.where(id: 'new_id').create }.to change{SimpleModel.count}.by(1)
+          end
+          end
+
+          describe "#first_or_create" do
+            it 'should create the object or return matching' do
+              expect{SimpleModel.where(id: 'another_id').first_or_create }.to change{SimpleModel.count}.by(1)
+              expect{SimpleModel.where(id: 'another_id').first_or_create }.not_to change{SimpleModel.count}
+            end
+          end
+        end
+      end
     end
 
     context 'querying by attributes' do
