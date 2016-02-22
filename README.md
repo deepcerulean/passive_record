@@ -27,7 +27,6 @@ PassiveRecord may be right for you!
 
 ## Features
 
-  - New objects are tracked and assigned IDs
   - Build relationships with belongs_to, has_one and has_many
   - Query on attributes and associations
   - Supports many-to-many and self-referential relationships
