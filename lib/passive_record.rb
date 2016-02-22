@@ -1,3 +1,5 @@
+require 'ostruct'
+
 require 'active_support'
 require 'active_support/core_ext/string/inflections'
 

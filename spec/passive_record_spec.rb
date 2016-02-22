@@ -16,82 +16,90 @@ describe PassiveRecord do
   end
 end
 
-describe Model do
-  describe "with a simple model including PR" do
+describe "passive record models" do
+  context "with a simple model including PR" do
     let!(:model) { SimpleModel.create(foo: value) }
     let(:value) { 'foo_value' }
 
-    describe "#inspect" do
-      it 'should report attribute details' do
-        expect(model.inspect).to eq("SimpleModel (id: #{model.id.inspect}, foo: \"foo_value\")")
+    describe "instance methods" do
+      describe "#inspect" do
+        it 'should report attribute details' do
+          expect(model.inspect).to eq("SimpleModel (id: #{model.id.inspect}, foo: \"foo_value\")")
+        end
+      end
+
+      describe "#id" do
+        it 'should be retrievable by id' do
+          expect(SimpleModel.find_by(model.id)).to eq(model)
+        end
       end
     end
 
-    describe "#id" do
-      it 'should be retrievable by id' do
-        expect(SimpleModel.find_by(model.id)).to eq(model)
+    describe "class methods" do
+      describe "#first" do
+        it 'should find the first model' do
+          expect(Model.first).to eq(Model.find(1))
+        end
       end
-    end
 
-    context 'should be enumerable over models' do
       describe "#count" do
         it 'should indicate the size of the models list' do
           expect { SimpleModel.create }.to change { SimpleModel.count }.by(1)
         end
       end
-    end
 
-    describe "#create" do
-      it 'should assign attributes' do
-        expect(model.foo).to eq('foo_value')
-      end
-    end
-
-    describe "#destroy_all" do
-      before {
-        SimpleModel.create(foo: 'val1')
-        SimpleModel.create(foo: 'val2')
-      }
-
-      it 'should remove all models' do
-        expect { SimpleModel.destroy_all }.to change { SimpleModel.count }.by(-SimpleModel.count)
-      end
-    end
-
-    context 'querying by id' do
-      describe "#find" do
-        subject(:model) {  SimpleModel.create }
-        it 'should lookup a record based on an identifier' do
-          expect(SimpleModel.find(-1)).to eq(nil)
-          expect(SimpleModel.find(model.id)).to eq(model)
-        end
-
-        it 'should lookup records based on primary key value' do
-          expect(SimpleModel.find(model.id.value)).to eq(model)
-        end
-
-        it 'should lookup records based on ids' do
-          model_b = SimpleModel.create
-          expect(SimpleModel.find([model.id, model_b.id])).to eq([model, model_b])
+      describe "#create" do
+        it 'should assign attributes' do
+          expect(model.foo).to eq('foo_value')
         end
       end
 
-      describe "#where" do
-        it 'should return a query obj' do
-          expect(SimpleModel.where(id: 'fake_id')).to be_a(PassiveRecord::Core::Query)
-        end
+      describe "#destroy_all" do
+        before {
+          SimpleModel.create(foo: 'val1')
+          SimpleModel.create(foo: 'val2')
+        }
 
-        context "queries" do
-          describe "#create" do
-          it 'should create objects' do
-            expect{SimpleModel.where(id: 'new_id').create }.to change{SimpleModel.count}.by(1)
-          end
+        it 'should remove all models' do
+          expect { SimpleModel.destroy_all }.to change { SimpleModel.count }.by(-SimpleModel.count)
+        end
+      end
+
+      context 'querying by id' do
+        describe "#find" do
+          subject(:model) {  SimpleModel.create }
+          it 'should lookup a record based on an identifier' do
+            expect(SimpleModel.find(-1)).to eq(nil)
+            expect(SimpleModel.find(model.id)).to eq(model)
           end
 
-          describe "#first_or_create" do
-            it 'should create the object or return matching' do
-              expect{SimpleModel.where(id: 'another_id').first_or_create }.to change{SimpleModel.count}.by(1)
-              expect{SimpleModel.where(id: 'another_id').first_or_create }.not_to change{SimpleModel.count}
+          it 'should lookup records based on primary key value' do
+            expect(SimpleModel.find(model.id.value)).to eq(model)
+          end
+
+          it 'should lookup records based on ids' do
+            model_b = SimpleModel.create
+            expect(SimpleModel.find([model.id, model_b.id])).to eq([model, model_b])
+          end
+        end
+
+        describe "#where" do
+          it 'should return a query obj' do
+            expect(SimpleModel.where(id: 'fake_id')).to be_a(PassiveRecord::Core::Query)
+          end
+
+          context "queries" do
+            describe "#create" do
+              it 'should create objects' do
+                expect{SimpleModel.where(id: 'new_id').create }.to change{SimpleModel.count}.by(1)
+              end
+            end
+
+            describe "#first_or_create" do
+              it 'should create the object or return matching' do
+                expect{SimpleModel.where(id: 'another_id').first_or_create }.to change{SimpleModel.count}.by(1)
+                expect{SimpleModel.where(id: 'another_id').first_or_create }.not_to change{SimpleModel.count}
+              end
             end
           end
         end
