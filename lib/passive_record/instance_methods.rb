@@ -28,24 +28,19 @@ module PassiveRecord
     def send_relation(matching_relation, meth, *args, &blk)
       target_name = matching_relation.association.target_name_symbol.to_s
 
-      if meth.to_s == target_name
+      case meth.to_s
+      when target_name       
         matching_relation.lookup
-
-      elsif meth.to_s == target_name + "="
+      when "#{target_name}=" 
         matching_relation.parent_model_id = args.first.id
-
-      elsif meth.to_s.start_with?("create_")
+      when "create_#{target_name}", "create_#{target_name.singularize}"
         matching_relation.create(*args)
-
-      elsif meth.to_s == target_name + "_id"
+      when "#{target_name}_id"
         matching_relation.parent_model_id
-
-      elsif meth.to_s == target_name + "_id="
+      when "#{target_name}_id="
         matching_relation.parent_model_id = args.first
-
-      elsif meth.to_s == target_name + "_ids" || meth.to_s == target_name.singularize + "_ids"
+      when "#{target_name}_ids", "#{target_name.singularize}_ids"
         matching_relation.parent_model.send(target_name).map(&:id)
-
       end
     end
 
@@ -68,16 +63,22 @@ module PassiveRecord
 
     def find_relation_by_target_name_symbol(meth)
       relata.detect do |relation|  # matching relation...
-        target_name = relation.association.target_name_symbol.to_s
-        meth == relation.association.target_name_symbol ||
-          meth.to_s == target_name + "=" ||
-          meth.to_s == target_name + "_id" ||
-          meth.to_s == target_name + "_ids" ||
-          meth.to_s == target_name.singularize + "_ids" ||
-          meth.to_s == target_name + "_id=" ||
-          meth.to_s == "create_" + target_name ||
-          meth.to_s == "create_" + target_name.singularize
+        possible_target_names(relation).include?(meth.to_s)
       end
+    end
+
+    def possible_target_names(relation)
+      target_name = relation.association.target_name_symbol.to_s
+      [
+        target_name,
+        "#{target_name}=",
+        "#{target_name}_id",
+        "#{target_name}_ids",
+        "#{target_name.singularize}_ids",
+        "#{target_name}_id=",
+        "create_#{target_name}",
+        "create_#{target_name.singularize}"
+      ]
     end
   end
 end
