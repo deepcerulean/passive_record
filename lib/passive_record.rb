@@ -10,6 +10,8 @@ require 'passive_record/class_inheritable_attrs'
 require 'passive_record/associations'
 require 'passive_record/hooks'
 
+require 'passive_record/pretty_printing'
+
 require 'passive_record/instance_methods'
 require 'passive_record/class_methods'
 

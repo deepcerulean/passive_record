@@ -21,6 +21,12 @@ describe Model do
     let!(:model) { SimpleModel.create(foo: value) }
     let(:value) { 'foo_value' }
 
+    describe "#inspect" do
+      it 'should report attribute details' do
+        expect(model.inspect).to eq("SimpleModel (id: 1, foo: \"foo_value\")")
+      end
+    end
+
     describe "#id" do
       it 'should be retrievable by id' do
         expect(SimpleModel.find_by(model.id)).to eq(model)
@@ -230,4 +236,5 @@ describe Model do
       end
     end
   end
+
 end

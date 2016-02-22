@@ -1,11 +1,6 @@
 module PassiveRecord
   module InstanceMethods
-    def inspect
-      pretty_vars = instance_variables_hash.map do |k,v|
-        "#{k.to_s.gsub(/^\@/,'')}: #{v.inspect}"
-      end.join(', ')
-      "#{self.class.name} (#{pretty_vars})"
-    end
+    include PrettyPrinting
 
     def respond_to?(meth,*args,&blk)
       if find_relation_by_target_name_symbol(meth)
@@ -29,9 +24,9 @@ module PassiveRecord
       target_name = matching_relation.association.target_name_symbol.to_s
 
       case meth.to_s
-      when target_name       
+      when target_name
         matching_relation.lookup
-      when "#{target_name}=" 
+      when "#{target_name}="
         matching_relation.parent_model_id = args.first.id
       when "create_#{target_name}", "create_#{target_name.singularize}"
         matching_relation.create(*args)
@@ -44,22 +39,13 @@ module PassiveRecord
       end
     end
 
-    private
-
-    # from http://stackoverflow.com/a/8417341/90042
-    def instance_variables_hash
-      Hash[
-        instance_variables.
-        reject { |sym| sym.to_s.start_with?("@_") }.
-        map { |name| [name, instance_variable_get(name)] }
-      ]
-    end
-
     def relata
       @_relata ||= self.class.associations.map do |assn|
         assn.to_relation(self)
       end
     end
+
+    private
 
     def find_relation_by_target_name_symbol(meth)
       relata.detect do |relation|  # matching relation...
