@@ -82,19 +82,6 @@ PassiveRecord may be right for you!
     => [Dog (id: 1)]
 ````
 
-## Requirements
-
-## Install
-
-    $ gem install passive_record
-
-
-## Synopsis
-
-    $ passive_record
-
 ## Copyright
 
 Copyright (c) 2016 Joseph Weissman
-
-See {file:LICENSE.txt} for details.
