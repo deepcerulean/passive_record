@@ -52,7 +52,15 @@ module PassiveRecord
       when target_name
         matching_relation.lookup
       when "#{target_name}="
-        matching_relation.parent_model_id = args.first.id
+        if args.first.is_a?(Array)
+          # need to loop through each arg and set id
+          args.first.each do |child|
+            child.send(matching_relation.parent_model_id_field + "=", id)
+          end
+        else
+          # assume simple assignment
+          matching_relation.parent_model_id = args.first.id
+        end
       when "create_#{target_name}", "create_#{target_name.singularize}"
         matching_relation.create(*args)
       when "#{target_name}_id"

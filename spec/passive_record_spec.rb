@@ -182,10 +182,16 @@ describe "passive record models" do
 
     context 'one-to-many relationships' do
       let(:parent) { Parent.create }
+      let(:another_parent) { Parent.create(children: [another_child]) }
+      let(:another_child) { Child.create }
 
       it 'should create children' do
         expect { parent.create_child }.to change{ Child.count }.by(1)
         expect(parent.children).to all(be_a(Child))
+      end
+
+      it 'should assign children on creation' do
+        expect(another_parent.children).to match_array([another_child])
       end
 
       it 'should create inverse relationships' do
