@@ -30,12 +30,13 @@ module PassiveRecord
     end
 
     def find_by(conditions)
-      if conditions.is_a?(Identifier)
-        find_by_id(conditions)
-      elsif conditions.is_a?(Array) && conditions.all? { |c| c.is_a?(Identifier) }
-        find_by_ids(conditions)
-      else
+      #if conditions.is_a?(Array)
+      #  find_by_ids(conditions)
+      if conditions.is_a?(Hash)
         where(conditions).first
+      else # assume we have an identifier/identifiers
+        find(conditions)
+        # find_by_id(conditions)
       end
     end
 
@@ -76,8 +77,7 @@ module PassiveRecord
 
     protected
     def find_by_id(id_to_find)
-      key = instances_by_id.keys.detect { |id,_| id == id_to_find }
-      instances_by_id[key] if key
+      find_by(id: id_to_find)
     end
 
     def find_by_ids(ids)

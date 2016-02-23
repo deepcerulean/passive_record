@@ -10,6 +10,16 @@ module PassiveRecord
       @associations += [assn]
     end
 
+    def associations_id_syms
+      @associations&.map do |assn|
+        if assn.is_a?(HasOneAssociation) || assn.is_a?(BelongsToAssociation)
+          (assn.target_name_symbol.to_s + "_id").to_sym
+        else # plural ids
+          (assn.target_name_symbol.to_s + "_ids").to_sym
+        end
+      end || []
+    end
+
     def belongs_to(parent_name_sym, opts={})
       target_class_name = opts.delete(:class_name) { (parent_name_sym.to_s).split('_').map(&:capitalize).join }
       association = BelongsToAssociation.new(self, target_class_name, parent_name_sym)

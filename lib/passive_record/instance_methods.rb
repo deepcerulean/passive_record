@@ -2,6 +2,31 @@ module PassiveRecord
   module InstanceMethods
     include PrettyPrinting
 
+    def attribute_names
+      attr_names = instance_variables
+      attr_names += self.class.associations_id_syms
+      attr_names += members rescue []
+      attr_names.reject! { |name| name.to_s.start_with?("@_") }
+      attr_names - blacklisted_attribute_names
+    end
+
+    def blacklisted_attribute_names
+      []
+    end
+
+    # from http://stackoverflow.com/a/8417341/90042
+    def to_h
+      Hash[
+        attribute_names.
+        map do |name| [ 
+          name.to_s.gsub("@","").to_sym,  # key
+          (instance_variable_get(name) rescue send(name))] # val
+        end
+      ]
+    end
+
+    ###
+
     def respond_to?(meth,*args,&blk)
       if find_relation_by_target_name_symbol(meth)
         true
@@ -40,9 +65,9 @@ module PassiveRecord
     end
 
     def relata
-      @_relata ||= self.class.associations.map do |assn|
+      @_relata ||= self.class.associations&.map do |assn|
         assn.to_relation(self)
-      end
+      end || []
     end
 
     private

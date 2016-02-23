@@ -26,6 +26,11 @@ describe "passive record models" do
         it 'should report attribute details' do
           expect(model.inspect).to eq("SimpleModel (id: #{model.id.inspect}, foo: \"foo_value\")")
         end
+
+        it 'should report relations' do
+          dog = Dog.create
+          expect(dog.inspect).to eq("Dog (id: #{dog.id.inspect}, created_at: #{dog.created_at}, sound: \"bark\", child_id: nil)")
+        end
       end
 
       describe "#id" do
