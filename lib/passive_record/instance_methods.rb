@@ -2,16 +2,14 @@ module PassiveRecord
   module InstanceMethods
     include PrettyPrinting
 
-    def attribute_names
-      attr_names = instance_variables
-      attr_names += self.class.associations_id_syms
-      attr_names += members rescue []
-      attr_names.reject! { |name| name.to_s.start_with?("@_") }
-      attr_names - blacklisted_attribute_names
-    end
+    def update(attrs={})
+      attrs.each do |k,v|
+        send("#{k}=", v)
+      end
 
-    def blacklisted_attribute_names
-      []
+      self.class.after_update_hooks.each do |hook|
+        hook.run(self)
+      end
     end
 
     # from http://stackoverflow.com/a/8417341/90042
@@ -24,8 +22,6 @@ module PassiveRecord
         end
       ]
     end
-
-    ###
 
     def respond_to?(meth,*args,&blk)
       if find_relation_by_target_name_symbol(meth)
@@ -44,6 +40,45 @@ module PassiveRecord
     end
 
     protected
+    def attribute_names
+      attr_names = instance_variables
+      attr_names += self.class.associations_id_syms
+      attr_names += members rescue []
+      attr_names.reject! { |name| name.to_s.start_with?("@_") }
+      attr_names - blacklisted_attribute_names
+    end
+
+    def blacklisted_attribute_names
+      []
+    end
+
+    private
+
+    def relata
+      @_relata ||= self.class.associations&.map do |assn|
+        assn.to_relation(self)
+      end || []
+    end
+
+    def find_relation_by_target_name_symbol(meth)
+      relata.detect do |relation|  # matching relation...
+        possible_target_names(relation).include?(meth.to_s)
+      end
+    end
+
+    def possible_target_names(relation)
+      target_name = relation.association.target_name_symbol.to_s
+      [
+        target_name,
+        "#{target_name}=",
+        "#{target_name}_id",
+        "#{target_name}_ids",
+        "#{target_name.singularize}_ids",
+        "#{target_name}_id=",
+        "create_#{target_name}",
+        "create_#{target_name.singularize}"
+      ]
+    end
 
     def send_relation(matching_relation, meth, *args)
       target_name = matching_relation.association.target_name_symbol.to_s
@@ -70,34 +105,6 @@ module PassiveRecord
       when "#{target_name}_ids", "#{target_name.singularize}_ids"
         matching_relation.parent_model.send(target_name).map(&:id)
       end
-    end
-
-    def relata
-      @_relata ||= self.class.associations&.map do |assn|
-        assn.to_relation(self)
-      end || []
-    end
-
-    private
-
-    def find_relation_by_target_name_symbol(meth)
-      relata.detect do |relation|  # matching relation...
-        possible_target_names(relation).include?(meth.to_s)
-      end
-    end
-
-    def possible_target_names(relation)
-      target_name = relation.association.target_name_symbol.to_s
-      [
-        target_name,
-        "#{target_name}=",
-        "#{target_name}_id",
-        "#{target_name}_ids",
-        "#{target_name.singularize}_ids",
-        "#{target_name}_id=",
-        "create_#{target_name}",
-        "create_#{target_name.singularize}"
-      ]
     end
   end
 end

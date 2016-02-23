@@ -31,5 +31,17 @@ module PassiveRecord
       @hooks += [ hook ]
       self
     end
+
+    def after_update_hooks
+      @hooks ||= []
+      @hooks.select { |hook| hook.kind == :after_update }
+    end
+
+    def after_update(*meth_syms, &blk)
+      hook = Hook.new(:after_update,*meth_syms,&blk)
+      @hooks ||= []
+      @hooks += [ hook ]
+      self
+    end
   end
 end

@@ -13,6 +13,8 @@ end
 
 class SimpleModel < Struct.new(:foo)
   include PassiveRecord
+  attr_reader :updated_at
+  after_update { @updated_at = Time.now }
 end
 
 module Family

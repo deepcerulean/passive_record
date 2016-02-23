@@ -22,6 +22,17 @@ describe "passive record models" do
     let(:value) { 'foo_value' }
 
     describe "instance methods" do
+      describe "#update" do
+        it 'should update attrs' do
+          expect {model.update(foo: '123')}.to change {model.foo}.from(value).to('123')
+        end
+
+        it 'should invoke callbacks' do
+          model.update(foo: 'barbazquux')
+          expect(model.updated_at).to be_a(Time)
+        end
+      end
+
       describe "#inspect" do
         it 'should report attribute details' do
           expect(model.inspect).to eq("SimpleModel (id: #{model.id.inspect}, foo: \"foo_value\")")
