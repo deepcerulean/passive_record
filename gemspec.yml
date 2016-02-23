@@ -5,7 +5,8 @@ license: MIT
 authors: Joseph Weissman
 email: jweissman1986@gmail.com
 homepage: https://rubygems.org/gems/passive_record
-
+dependencies:
+  activesupport: ~> 4.2
 development_dependencies:
   bundler: ~> 1.10
   codeclimate-test-reporter: ~> 0.1
