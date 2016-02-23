@@ -15,34 +15,37 @@ class SimpleModel < Struct.new(:foo)
   include PassiveRecord
 end
 
-class Dog < Model
-  attr_reader :sound
-  belongs_to :child
-  after_create {@sound = 'bark'}
+module Family
+  class Dog < Model
+    attr_reader :sound
+    belongs_to :child
+    after_create {@sound = 'bark'}
+  end
+
+  class Toy < Model
+    belongs_to :child
+    attr_reader :kind
+    after_create {@kind = %w[ stuffed_animal blocks cards ].sample}
+  end
+
+  class Child < Model
+    has_one :toy
+    has_many :dogs
+    belongs_to :parent
+
+    attr_reader :name
+    after_create :give_name
+
+    def give_name; @name = "Alice" end
+  end
+
+  class Parent < Model
+    has_many :children
+    has_many :dogs, :through => :children
+    has_many :toys, :through => :children
+  end
 end
-
-class Toy < Model
-  belongs_to :child
-  attr_reader :kind
-  after_create {@kind = %w[ stuffed_animal blocks cards ].sample}
-end
-
-class Child < Model
-  has_one :toy
-  has_many :dogs
-  belongs_to :parent
-
-  attr_reader :name
-  after_create :give_name
-
-  def give_name; @name = "Alice" end
-end
-
-class Parent < Model
-  has_many :children
-  has_many :dogs, :through => :children
-  has_many :toys, :through => :children
-end
+include Family
 
 ###
 

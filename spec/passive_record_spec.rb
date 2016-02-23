@@ -29,7 +29,7 @@ describe "passive record models" do
 
         it 'should report relations' do
           dog = Dog.create
-          expect(dog.inspect).to eq("Dog (id: #{dog.id.inspect}, created_at: #{dog.created_at}, sound: \"bark\", child_id: nil)")
+          expect(dog.inspect).to eq("Family::Dog (id: #{dog.id.inspect}, created_at: #{dog.created_at}, sound: \"bark\", child_id: nil)")
         end
       end
 

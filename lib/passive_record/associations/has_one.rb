@@ -29,7 +29,7 @@ module PassiveRecord
       end
 
       def parent_class_name
-        association.parent_class.name.underscore
+        association.parent_class.name.split('::').last.underscore
       end
 
       def child_class
