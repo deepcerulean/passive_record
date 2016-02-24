@@ -130,9 +130,9 @@ PassiveRecord may be right for you!
   - `parent.child_id=`
   - `parent.create_child(attrs)`
 
-### Has Many
+### Has Many / Has Many Through / HABTM
 
-  A model `Parent` which declares `has_many :children` will gain:
+  A model `Parent` which declares `has_many :children` or `has_and_belongs_to_many :children` will gain:
 
   - `parent.children` (returns a `Relation`, documented below)
   - `parent.children_ids`
