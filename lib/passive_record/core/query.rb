@@ -1,8 +1,9 @@
 module PassiveRecord
   module Core
     class Query
-      include Enumerable 
+      include Enumerable
       extend Forwardable
+
       attr_accessor :klass, :conditions
 
       def initialize(klass,conditions={})
@@ -45,16 +46,10 @@ module PassiveRecord
       def evaluate_nested_conditions(instance, field, value)
         association = instance.send(field)
         association && value.all? do |(association_field,val)|
-          if association.is_a?(Array)
-            association.any? do |assc_model|
-              assc_model.send(association_field) == val
-            end
+          if association.is_a?(Associations::Relation) && !association.singular?
+            association.where(association_field => val).any?
           else
-            if association.is_a?(Associations::Relation) && !association.singular?
-              association.where(association_field => val).any?
-            else
-              association.send(association_field) == val
-            end
+            association.send(association_field) == val
           end
         end
       end

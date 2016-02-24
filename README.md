@@ -146,7 +146,7 @@ PassiveRecord may be right for you!
 
 ### Explicit Relations
 
-  Parent models decorated with `has_many :children` gain a `parent.children` instance which directly returns a PassiveRecord relation object, which has the following public interface:
+  Parent models which declare `has_many :children` gain a `parent.children` instance that returns an explicit PassiveRecord relation object, which has the following public interface:
 
   - `parent.children.all`
   - `parent.children.each` enumerates over `parent.children.all`, giving `parent.children.count`, `parent.children.first`, etc.
@@ -157,7 +157,7 @@ PassiveRecord may be right for you!
 
 ### Queries
 
-  `Core::Query` objects (usually acquired through `where`) are chainable and have their own API.
+  `Core::Query` objects acquired through `where` are chainable and have their own API.
 
   - `where(conditions).all`
   - `where(conditions).each` enumerates over `where(conditions).all`, so we have `where(conditions).count`, `where(conditions).first`, etc.
