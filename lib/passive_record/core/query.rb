@@ -15,21 +15,7 @@ module PassiveRecord
         klass.select do |instance|
           conditions.all? do |(field,value)|
             if value.is_a?(Hash)
-              assn = instance.send(field)
-              matched = assn && value.all? do |(assn_field,val)|
-                if assn.is_a?(Array)
-                  assn.any? do |assc_model|
-                    assc_model.send(assn_field) == val
-                  end
-                else
-                  if assn.is_a?(Core::Query) || (assn.is_a?(Associations::Relation) && !assn.singular?)
-                    assn.where(assn_field => val)
-                  else
-                    assn.send(assn_field) == val
-                  end
-                end
-              end
-              matched
+              evaluate_nested_conditions(instance, field, value)
             else
               instance.send(field) == value
             end
@@ -53,6 +39,24 @@ module PassiveRecord
 
       def ==(other_query)
         @klass == other_query.klass && @conditions == other_query.conditions
+      end
+
+      protected
+      def evaluate_nested_conditions(instance, field, value)
+        association = instance.send(field)
+        association && value.all? do |(association_field,val)|
+          if association.is_a?(Array)
+            association.any? do |assc_model|
+              assc_model.send(association_field) == val
+            end
+          else
+            if association.is_a?(Associations::Relation) && !association.singular?
+              association.where(association_field => val).any?
+            else
+              association.send(association_field) == val
+            end
+          end
+        end
       end
     end
   end
