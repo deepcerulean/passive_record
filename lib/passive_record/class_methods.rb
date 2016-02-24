@@ -30,13 +30,10 @@ module PassiveRecord
     end
 
     def find_by(conditions)
-      #if conditions.is_a?(Array)
-      #  find_by_ids(conditions)
       if conditions.is_a?(Hash)
         where(conditions).first
       else # assume we have an identifier/identifiers
         find(conditions)
-        # find_by_id(conditions)
       end
     end
 

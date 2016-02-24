@@ -22,7 +22,7 @@ module Family
     attr_reader :sound
     attr_accessor :breed
     belongs_to :child
-    before_create { @breed=%w[pom pug].sample }
+    before_create { @breed = %w[pom pug].sample }
     after_create { @sound = 'bark' }
   end
 

@@ -1,6 +1,6 @@
 module PassiveRecord
   module Core
-    class Query # < Struct.new(:klass, :conditions)
+    class Query
       include Enumerable 
       extend Forwardable
       attr_accessor :klass, :conditions
@@ -23,7 +23,7 @@ module PassiveRecord
                   end
                 else
                   if assn.is_a?(Core::Query) || (assn.is_a?(Associations::Relation) && !assn.singular?)
-                    assn.where(assn_field => val) # send(assn_field) == val
+                    assn.where(assn_field => val)
                   else
                     assn.send(assn_field) == val
                   end
@@ -37,10 +37,6 @@ module PassiveRecord
         end
       end
       def_delegators :all, :each
-
-      # def first
-      #   all.first
-      # end
 
       def create(attrs={})
         klass.create(conditions.merge(attrs))

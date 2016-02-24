@@ -104,7 +104,7 @@ PassiveRecord may be right for you!
   - `User.find_by(conditions_hash)`
   - `User.find_all_by(conditions_hash)`
   - `User.all` and `User.each`
-  -  User is enumerable through `User.all`, so we have `User.count`, `User.first`, etc.
+  - `User.each` enumerates over `User.all`, giving `User.count`, `User.first`, etc.
   - `User.where(conditions_hash)` (returns a `PassiveRecord::Query` object)
   - `User.descendants`
   - `User.destroy_all`
@@ -149,7 +149,7 @@ PassiveRecord may be right for you!
   Parent models decorated with `has_many :children` gain a `parent.children` instance which directly returns a PassiveRecord relation object, which has the following public interface:
 
   - `parent.children.all`
-  -  `parent.children` is enumerable through `parent.children.all`, so we have `parent.children.count`, `parent.children.first`, etc.
+  - `parent.children.each` enumerates over `parent.children.all`, giving `parent.children.count`, `parent.children.first`, etc.
   - `parent.children.all?(&predicate)`
   - `parent.children.empty?`
   - `parent.children.where(conditions)` (returns a `Core::Query`)
@@ -160,7 +160,7 @@ PassiveRecord may be right for you!
   `Core::Query` objects (usually acquired through `where`) are chainable and have their own API.
 
   - `where(conditions).all`
-  - Queries are enumerable through `#all`, so we have `where(conditions).count`, `where(conditions).first`, etc.
+  - `where(conditions).each` enumerates over `where(conditions).all`, so we have `where(conditions).count`, `where(conditions).first`, etc.
   - `where(conditions).create(attrs)`
   - `where(conditions).first_or_create`
   - `where(conditions).where(further_conditions)` (chaining)

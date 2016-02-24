@@ -59,7 +59,7 @@ module PassiveRecord
     end
 
     def find_relation_by_target_name_symbol(meth)
-      relata.detect do |relation|  # matching relation...
+      relata.detect do |relation|
         possible_target_names(relation).include?(meth.to_s)
       end
     end
@@ -90,12 +90,10 @@ module PassiveRecord
         end
       when "#{target_name}="
         if args.first.is_a?(Array)
-          # need to loop through each arg and set id
           args.first.each do |child|
             child.send(matching_relation.parent_model_id_field + "=", id)
           end
         else
-          # assume simple assignment
           matching_relation.parent_model_id = args.first.id
         end
       when "create_#{target_name}", "create_#{target_name.singularize}"
