@@ -162,7 +162,7 @@ PassiveRecord may be right for you!
   - `where(conditions).all`
   - `where(conditions).each` enumerates over `where(conditions).all`, so we have `where(conditions).count`, `where(conditions).first`, etc.
   - `where(conditions).create(attrs)`
-  - `where(conditions).first_or_create`
+  - `where(conditions).first_or_create(attrs)`
   - `where(conditions).where(further_conditions)` (chaining)
 
 ## Hooks

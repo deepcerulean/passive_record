@@ -11,7 +11,7 @@ module PassiveRecord
     end
 
     class HasManyRelation < HasOneRelation
-      include Enumerable 
+      include Enumerable
       extend Forwardable
 
       def all
@@ -30,7 +30,7 @@ module PassiveRecord
       def where(conditions)
         child_class.where(conditions.merge(parent_model_id_field.to_sym => parent_model.id))
       end
-      
+
       def <<(child)
         child.send(parent_model_id_field + "=", parent_model.id)
         lookup

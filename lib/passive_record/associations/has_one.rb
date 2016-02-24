@@ -1,7 +1,6 @@
 module PassiveRecord
   module Associations
     class HasOneAssociation < Struct.new(:parent_class, :child_class_name, :child_name_sym)
-
       def to_relation(parent_model)
         HasOneRelation.new(self, parent_model)
       end
