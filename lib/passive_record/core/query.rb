@@ -38,12 +38,12 @@ module PassiveRecord
       end
       def_delegators :all, :each
 
-      def first
-        all.first
-      end
+      # def first
+      #   all.first
+      # end
 
-      def create
-        klass.create(conditions)
+      def create(attrs={})
+        klass.create(conditions.merge(attrs))
       end
 
       def first_or_create
