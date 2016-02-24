@@ -332,6 +332,15 @@ describe "passive record models" do
         expect(user_b.friends.all).to eq([user_a])
       end
     end
+
+    context 'direct habtm' do
+      let(:user) { User.create roles: [role] }
+      let(:role) { Role.create }
+
+      xit 'should manage direct habtm relations' do
+        expect(role.users).to include(user)
+      end
+    end
   end
 end
 
