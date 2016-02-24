@@ -131,11 +131,19 @@ PassiveRecord may be right for you!
 
   A model `Parent` which declares `has_many :children` will gain:
 
-  - `parent.children`
+  - `parent.children` (returns a `Relation`)
   - `parent.children_ids`
   - `parent.children=`
   - `parent.children_ids=`
   - `parent.create_child(attrs)`
+  - `parent.children<<` (insert a related model)
+  - `parent.children.all?(&predicate)`
+  - `parent.children.empty?`
+  - `parent.children.where` (returns a `Core::Query`)
+
+## Queries
+
+
 
 ## Hooks
 
