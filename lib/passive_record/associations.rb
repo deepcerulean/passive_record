@@ -50,5 +50,9 @@ module PassiveRecord
         associate!(association)
       end
     end
+
+    def has_and_belongs_to_many(collection_name_sym)
+      # ...
+    end
   end
 end

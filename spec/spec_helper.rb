@@ -80,6 +80,11 @@ end
 class User < Model
   has_many :friendships
   has_many :friends, :through => :friendships
+  has_and_belongs_to_many :roles
+end
+
+class Role < Model
+  has_and_belongs_to_many :users
 end
 
 ### 
