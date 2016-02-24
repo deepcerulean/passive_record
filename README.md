@@ -167,7 +167,8 @@ PassiveRecord may be right for you!
 
 ## Hooks
 
-  - `after_create :call_method`
+  - `before_create :call_a_method`
+  - `after_create :call_another_method, :and_then_call_another_one`
   - `after_update { or_use_a_block }`
 
 ## Copyright
