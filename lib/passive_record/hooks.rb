@@ -20,6 +20,17 @@ module PassiveRecord
       end
     end
 
+    def before_create_hooks
+      @hooks ||= []
+      @hooks.select { |hook| hook.kind == :before_create }
+    end
+
+    def before_create(*meth_syms, &blk)
+      hook = Hook.new(:before_create,*meth_syms,&blk)
+      @hooks ||= []
+      @hooks += [ hook ]
+    end
+
     def after_create_hooks
       @hooks ||= []
       @hooks.select { |hook| hook.kind == :after_create }

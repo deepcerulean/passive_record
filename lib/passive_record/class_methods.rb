@@ -60,6 +60,10 @@ module PassiveRecord
 
       register(instance)
 
+      before_create_hooks.each do |hook|
+        hook.run(instance)
+      end
+
       attrs.each do |(k,v)|
         instance.send("#{k}=", v)
       end

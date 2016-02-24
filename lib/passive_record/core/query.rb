@@ -1,10 +1,18 @@
 module PassiveRecord
   module Core
-    class Query < Struct.new(:klass, :conditions)
+    class Query # < Struct.new(:klass, :conditions)
+      include Enumerable 
+      extend Forwardable
+      attr_accessor :klass, :conditions
+
+      def initialize(klass,conditions={})
+        @klass = klass
+        @conditions = conditions
+      end
+
       def all
         return [] unless conditions
-
-        klass.all.select do |instance|
+        klass.select do |instance|
           conditions.all? do |(field,value)|
             if value.is_a?(Hash)
               assn = instance.send(field)
@@ -28,6 +36,7 @@ module PassiveRecord
           end
         end
       end
+      def_delegators :all, :each
 
       def first
         all.first
@@ -39,6 +48,15 @@ module PassiveRecord
 
       def first_or_create
         first || create
+      end
+
+      def where(new_conditions={})
+        @conditions = new_conditions.merge(conditions)
+        self
+      end
+
+      def ==(other_query)
+        @klass == other_query.klass && @conditions == other_query.conditions
       end
     end
   end

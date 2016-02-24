@@ -20,8 +20,10 @@ end
 module Family
   class Dog < Model
     attr_reader :sound
+    attr_accessor :breed
     belongs_to :child
-    after_create {@sound = 'bark'}
+    before_create { @breed=%w[pom pug].sample }
+    after_create { @sound = 'bark' }
   end
 
   class Toy < Model
