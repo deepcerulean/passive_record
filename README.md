@@ -59,31 +59,30 @@ PassiveRecord may be right for you!
     # Let's build some models!
     parent = Parent.create
     => Parent (id: 1, child_ids: [], dog_ids: [])
-    
+
     child = parent.create_child
     => Child (id: 1, dog_id: nil, parent_id: 1)
-    
+
     dog = child.create_dog
     => Dog (id: 1, child_id: 1)
-    
+
     # Inverse relationships
     dog.child
     => Child (id: 1, dog_id: 1, parent_id: 1)
-    
+
     Dog.find_by child: child
     => Dog (id: 1, child_id: 1)
-    
+
     # Has many through
     parent.dogs
     => [ ...has_many :through relation... ]
-    
+
     parent.dogs.all
     => [Dog (id: 1, child_id: 1)]
-    
+
     # Nested queries
     Dog.find_all_by(child: { parent: parent })
     => [Dog (id: 1, child_id: 1)]
-
 ````
 
 ## Interface
