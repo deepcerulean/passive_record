@@ -32,6 +32,7 @@ PassiveRecord may be right for you!
   - Supports many-to-many and self-referential relationships
   - No database required!
   - Just `include PassiveRecord` to get started
+
 ## Examples
 
 ````ruby
@@ -106,6 +107,7 @@ PassiveRecord may be right for you!
   - `User.destroy_all`
 
 ## Relationships
+
 ### Belongs To
 
   A model `Child` which is declared `belongs_to :parent` will gain:
@@ -139,7 +141,6 @@ PassiveRecord may be right for you!
 
   - `after_create :call_method`
   - `after_update { or_use_a_block }`
-
 
 ## Copyright
 
