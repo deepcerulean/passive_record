@@ -11,8 +11,34 @@ module PassiveRecord
     end
 
     class HasManyRelation < HasOneRelation
-      def lookup
+      include Enumerable 
+      include Enumerable
+      extend Forwardable
+
+      def all
         child_class.where(parent_model_id_field => parent_model.id).all
+      end
+      def_delegators :all, :each
+
+      def all?(*args)
+        all.all?(*args)
+      end
+
+      def empty?
+        all.empty?
+      end
+
+      def where(conditions)
+        child_class.where(conditions.merge(parent_model_id_field => parent_model.id))
+      end
+      
+      def <<(child)
+        child.send(parent_model_id_field + "=", parent_model.id)
+        lookup
+      end
+
+      def singular?
+        false
       end
     end
   end

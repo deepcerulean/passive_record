@@ -11,7 +11,13 @@ module PassiveRecord
       end
     end
 
-    class HasOneRelation < Struct.new(:association, :parent_model)
+    class Relation < Struct.new(:association, :parent_model)
+      def singular?
+        true
+      end
+    end
+
+    class HasOneRelation < Relation
       def lookup
         child_class.find_by(parent_model_id_field => parent_model.id)
       end
@@ -33,8 +39,11 @@ module PassiveRecord
       end
 
       def child_class
-        # binding.pry
         Object.const_get(association.child_class_name.singularize)
+      end
+
+      def id
+        parent_model.id
       end
     end
   end

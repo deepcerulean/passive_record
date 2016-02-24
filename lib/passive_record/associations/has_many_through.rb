@@ -11,13 +11,20 @@ module PassiveRecord
         association.base_association.to_relation(parent_model)
       end
 
+      def_delegators :all, :intermedia
+
       def results
-        intermediary_relation.lookup
+        intermediary_relation.all
       end
 
-      def lookup
+      def all
         if target_sym && results
-          results.flat_map(&target_sym)
+          final_results = results.flat_map(&target_sym)
+          if final_results.first.is_a?(Associations::Relation) && !final_results.first.singular?
+            final_results.first.send(:all)
+          else
+            Array(final_results)
+          end
         else
           []
         end

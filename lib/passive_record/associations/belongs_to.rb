@@ -11,6 +11,10 @@ module PassiveRecord
     end
 
     class BelongsToRelation < Struct.new(:association, :child_model)
+      def singular?
+        true
+      end
+
       def lookup
         association.parent_class.find_by(parent_model_id)
       end

@@ -21,6 +21,7 @@ module PassiveRecord
   def self.included(base)
     base.send :include, InstanceMethods
     base.send :include, ClassLevelInheritableAttributes
+    base.send :include, PrettyPrinting
 
     base.class_eval do
       inheritable_attrs :hooks, :associations

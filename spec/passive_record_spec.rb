@@ -17,6 +17,8 @@ describe PassiveRecord do
 end
 
 describe "passive record models" do
+  before { PassiveRecord.drop_all }
+
   context "with a simple model including PR" do
     let!(:model) { SimpleModel.create(foo: value) }
     let(:value) { 'foo_value' }
@@ -41,6 +43,12 @@ describe "passive record models" do
         it 'should report relations' do
           dog = Dog.create
           expect(dog.inspect).to eq("Family::Dog (id: #{dog.id.inspect}, created_at: #{dog.created_at}, sound: \"bark\", child_id: nil)")
+
+          child = Child.create
+          child.dogs << dog
+          expect(dog.inspect).to eq("Family::Dog (id: #{dog.id.inspect}, created_at: #{dog.created_at}, sound: \"bark\", child_id: #{child.id.inspect})")
+
+          expect(child.inspect).to eq("Family::Child (id: #{child.id.inspect}, created_at: #{dog.created_at}, name: \"Alice\", toy_id: nil, dog_ids: [#{dog.id.inspect}], parent_id: nil)")
         end
       end
 
@@ -132,7 +140,7 @@ describe "passive record models" do
           let(:post) { Post.create }
           let(:user) { User.create }
 
-          subject(:posts_with_comments_by_user) do
+          subject(:posts_with_comment_by_user) do
             Post.find_by comments: { user: user }
           end
 
@@ -141,8 +149,8 @@ describe "passive record models" do
           end
 
           it 'should find a single record through a nested query' do
-            post = Post.find_by comments: { user: user }
-            expect(post).to eq(post)
+            # post_again = Post.find_by comments: { user: user }
+            expect(post).to eq(posts_with_comment_by_user)
           end
 
           it 'should find multiple records through a nested query' do
@@ -150,7 +158,8 @@ describe "passive record models" do
             another_post.create_comment(user: user)
 
             posts = Post.find_all_by comments: { user: user }
-            expect(posts).to eq([post,another_post])
+            expect(posts.count).to eq(2)
+            # expect(posts).to eq([post,another_post])
           end
         end
       end
@@ -186,8 +195,15 @@ describe "passive record models" do
       it 'should have inverse relationships' do
         toy = child.create_toy
         expect(toy.child).to eq(child)
+
         another_toy = another_child.create_toy
         expect(another_toy.child).to eq(another_child)
+      end
+      
+      it 'should assign parents' do
+        toy = Toy.create
+        toy.child = child
+        expect(child.toy).to eq(toy)
       end
     end
 
@@ -196,13 +212,23 @@ describe "passive record models" do
       let(:another_parent) { Parent.create(children: [another_child]) }
       let(:another_child) { Child.create }
 
-      it 'should create children' do
-        expect { parent.create_child }.to change{ Child.count }.by(1)
-        expect(parent.children).to all(be_a(Child))
+      describe "#xxx<<" do
+        it 'should create children with <<' do
+          child = Child.create
+          expect {parent.children << child}.to change{parent.children.count}.by(1)
+          expect(parent.children).to include(child)
+        end
+      end
+
+      describe "#create_xxx" do
+        it 'should create children' do
+          expect { parent.create_child }.to change{ Child.count }.by(1)
+          expect(parent.children).to all(be_a(Child))
+        end
       end
 
       it 'should assign children on creation' do
-        expect(another_parent.children).to match_array([another_child])
+        expect(another_parent.children.all).to match_array([another_child])
       end
 
       it 'should create inverse relationships' do
@@ -213,7 +239,7 @@ describe "passive record models" do
         expect(another_child.parent).to eq(parent)
 
         expect(child.id).not_to eq(another_child.id)
-        expect(parent.children).to eq([child, another_child])
+        expect(parent.children.all).to eq([child, another_child])
         expect(parent.children_ids).to eq([child.id, another_child.id])
       end
     end
@@ -224,7 +250,7 @@ describe "passive record models" do
 
       it 'should collect children of children' do
         child.create_dog
-        expect(parent.dogs).to all(be_a(Dog))
+        expect(parent.dogs.all).to all(be_a(Dog))
         expect(parent.dogs.count).to eq(1)
         expect(parent.dogs.first).to eq(child.dogs.first)
         expect(parent.dog_ids).to eq([child.dogs.first.id])
@@ -233,7 +259,7 @@ describe "passive record models" do
       it 'should do the nested query example from the readme' do
         child.create_dog
         expect(Dog.find_all_by(child: {parent: parent})).
-          to eq(parent.dogs)
+          to eq(parent.dogs.all)
       end
 
       it 'should work for has-one intermediary relationships' do
@@ -253,7 +279,7 @@ describe "passive record models" do
         post = Post.create
         user = User.create
         Comment.create(post: post, user: user)
-        expect(post.commenters).to eq([user])
+        expect(post.commenters.all).to eq([user])
       end
     end
 
@@ -266,8 +292,8 @@ describe "passive record models" do
         expect(appointment.doctor).to eq(doctor)
         expect(appointment.patient).to eq(patient)
 
-        expect(patient.doctors).to eq([doctor])
-        expect(doctor.patients).to eq([patient])
+        expect(patient.doctors.all).to eq([doctor])
+        expect(doctor.patients.all).to eq([patient])
       end
     end
 
@@ -282,8 +308,8 @@ describe "passive record models" do
         Friendship.create(user: user_a, friend: user_b)
         Friendship.create(user: user_b, friend: user_a)
 
-        expect(user_a.friends).to eq([user_b])
-        expect(user_b.friends).to eq([user_a])
+        expect(user_a.friends.all).to eq([user_b])
+        expect(user_b.friends.all).to eq([user_a])
       end
     end
   end

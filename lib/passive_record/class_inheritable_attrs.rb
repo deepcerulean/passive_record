@@ -14,7 +14,6 @@ module ClassLevelInheritableAttributes
         )
       end
 
-      # binding.pry
       @inheritable_attributes
     end
 

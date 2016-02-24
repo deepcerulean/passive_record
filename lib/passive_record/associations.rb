@@ -7,7 +7,8 @@ module PassiveRecord
   module Associations
     def associate!(assn)
       @associations ||= []
-      @associations += [assn]
+      @associations += [assn] unless @associations.include?(assn)
+      self
     end
 
     def associations_id_syms
@@ -15,7 +16,7 @@ module PassiveRecord
         if assn.is_a?(HasOneAssociation) || assn.is_a?(BelongsToAssociation)
           (assn.target_name_symbol.to_s + "_id").to_sym
         else # plural ids
-          (assn.target_name_symbol.to_s + "_ids").to_sym
+          (assn.target_name_symbol.to_s.singularize + "_ids").to_sym
         end
       end || []
     end

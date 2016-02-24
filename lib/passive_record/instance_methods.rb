@@ -1,7 +1,5 @@
 module PassiveRecord
   module InstanceMethods
-    include PrettyPrinting
-
     def update(attrs={})
       attrs.each do |k,v|
         send("#{k}=", v)
@@ -16,7 +14,7 @@ module PassiveRecord
     def to_h
       Hash[
         attribute_names.
-        map do |name| [ 
+        map do |name| [
           name.to_s.gsub("@","").to_sym,  # key
           (instance_variable_get(name) rescue send(name))] # val
         end
@@ -85,7 +83,11 @@ module PassiveRecord
 
       case meth.to_s
       when target_name
-        matching_relation.lookup
+        if matching_relation.singular?
+          matching_relation.lookup
+        else
+          matching_relation
+        end
       when "#{target_name}="
         if args.first.is_a?(Array)
           # need to loop through each arg and set id
@@ -99,7 +101,11 @@ module PassiveRecord
       when "create_#{target_name}", "create_#{target_name.singularize}"
         matching_relation.create(*args)
       when "#{target_name}_id"
-        matching_relation.parent_model_id
+        if matching_relation.is_a?(Associations::HasOneRelation)
+          matching_relation.lookup&.id
+        elsif matching_relation.is_a?(Associations::BelongsToRelation)
+          matching_relation.parent_model_id
+        end
       when "#{target_name}_id="
         matching_relation.parent_model_id = args.first
       when "#{target_name}_ids", "#{target_name.singularize}_ids"
