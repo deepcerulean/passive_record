@@ -334,11 +334,17 @@ describe "passive record models" do
     end
 
     context 'direct habtm' do
-      let(:user) { User.create roles: [role] }
+      let!(:user) { User.create roles: [role] }
       let(:role) { Role.create }
+      let(:another_user) { User.create }
 
-      xit 'should manage direct habtm relations' do
+      it 'should manage direct habtm relations' do
         expect(role.users).to include(user)
+        expect(user.roles).to include(role)
+        expect(role.user_ids).to eq([user.id])
+        expect(user.role_ids).to eq([role.id])
+
+        expect {role.users << another_user}.to change{role.users.count}.by(1)
       end
     end
   end

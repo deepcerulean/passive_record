@@ -52,7 +52,30 @@ module PassiveRecord
     end
 
     def has_and_belongs_to_many(collection_name_sym)
-      # ...
+      habtm_join_class_name =
+        self.name.split('::').last.singularize +
+        collection_name_sym.to_s.camelize.singularize +
+        "JoinModel"
+      inverse_habtm_join_class_name =
+        collection_name_sym.to_s.camelize.singularize +
+        self.name.split('::').last.singularize +
+        "JoinModel"
+
+      if (Object.const_get(inverse_habtm_join_class_name) rescue false)
+        has_many inverse_habtm_join_class_name.underscore.pluralize.to_sym
+        has_many collection_name_sym, :through => inverse_habtm_join_class_name.underscore.pluralize.to_sym
+      else
+        auto_collection_sym = self.name.split('::').last.underscore.pluralize.to_sym
+        eval <<-ruby
+        class ::#{habtm_join_class_name}                        # class UserRoleJoinModel
+          include PassiveRecord                                 #   include PassiveRecord
+          belongs_to :#{collection_name_sym.to_s.singularize}   #   belongs_to :role
+          belongs_to :#{auto_collection_sym.to_s.singularize}   #   belongs_to :user
+        end                                                     # end
+        ruby
+        has_many habtm_join_class_name.underscore.pluralize.to_sym
+        has_many(collection_name_sym, :through => habtm_join_class_name.underscore.pluralize.to_sym)
+      end
     end
   end
 end

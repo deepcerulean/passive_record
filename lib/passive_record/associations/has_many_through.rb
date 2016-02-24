@@ -7,14 +7,11 @@ module PassiveRecord
     end
 
     class HasManyThroughRelation < HasManyRelation
-      def intermediary_relation
-        association.base_association.to_relation(parent_model)
-      end
-
-      def_delegators :all, :intermedia
-
-      def results
-        intermediary_relation.all
+      def <<(child)
+        intermediary_relation.
+          where((target_sym.to_s.singularize + "_id").to_sym => child.id).
+          first_or_create
+        all
       end
 
       def all
@@ -28,6 +25,15 @@ module PassiveRecord
         else
           []
         end
+      end
+
+
+      def intermediary_relation
+        association.base_association.to_relation(parent_model)
+      end
+
+      def results
+        intermediary_relation.all
       end
 
       def target_sym

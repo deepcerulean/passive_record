@@ -90,8 +90,17 @@ module PassiveRecord
         end
       when "#{target_name}="
         if args.first.is_a?(Array)
-          args.first.each do |child|
-            child.send(matching_relation.parent_model_id_field + "=", id)
+          if matching_relation.is_a?(Associations::HasManyThroughRelation)
+            intermediary = matching_relation.intermediary_relation 
+            args.first.each do |child|
+              intermediary.
+                where((target_name.singularize + "_id").to_sym => child.id).
+                first_or_create
+            end
+          else
+            args.first.each do |child|
+              child.send(matching_relation.parent_model_id_field + "=", id)
+            end
           end
         else
           matching_relation.parent_model_id = args.first.id
