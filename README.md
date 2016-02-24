@@ -32,64 +32,6 @@ PassiveRecord may be right for you!
   - Supports many-to-many and self-referential relationships
   - No database required!
   - Just `include PassiveRecord` to get started
-
-### Including PassiveRecord
-
-  A class including PassiveRecord will gain the following new instance and class methods.
-
-#### Instance Methods
-
-  A class `Role` which is declared to `include PassiveRecord` will gain the following instance methods:
-  - `role.update(attrs_hash)`
-  - `role.to_h`
-  - We override `role.inspect` to show ID and visible attributes
-
-#### Class Methods
-
-  A class `User` which is declared to `include PassiveRecord` will gain the following class methods:
-  - `User.create(attrs_hash)`
-  - `User.find(id_or_ids)`
-  - `User.find_by(conditions_hash)`
-  - `User.find_all_by(conditions_hash)`
-  - `User.all` and `User.each`
-  -  User is `Enumerable` through `User.all`, so we have `User.count`, `User.first`, etc.
-  - `User.where(conditions_hash)` (returns a `PassiveRecord::Query` object)
-  - `User.descendants`
-  - `User.destroy_all`
-
-### Relationships
-#### Belongs To
-
-  A model `Child` which is declared `belongs_to :parent` will now respond to:
-
-  - `child.parent`
-  - `child.parent_id`
-  - `child.parent=`
-  - `child.parent_id=`
-
-#### Has One
-
-  A model `Parent` which declares `has_one :child` will respond to:
-  - `parent.child`
-  - `parent.child_id`
-  - `parent.child=`
-  - `parent.child_id=`
-  - `parent.create_child(attrs)`
-
-#### HasMany
-
-  A model `Parent` which declares `has_many :children` will respond to:
-  - `parent.children`
-  - `parent.children_ids`
-  - `parent.children=`
-  - `parent.children_ids=`
-  - `parent.create_child(attrs)`
-
-### Hooks
-
-  - `after_create :call_method`
-  - `after_update { or_use_a_block }`
-
 ## Examples
 
 ````ruby
@@ -138,6 +80,66 @@ PassiveRecord may be right for you!
     Dog.find_all_by(child: { parent: parent })
     => [Dog (id: 1)]
 ````
+
+## Interface
+
+  A class including PassiveRecord will gain the following new instance and class methods.
+
+### Instance Methods
+
+  A class `Role` which is declared to `include PassiveRecord` will gain the following instance methods:
+  - `role.update(attrs_hash)`
+  - `role.to_h`
+  - We override `role.inspect` to show ID and visible attributes
+
+### Class Methods
+
+  A class `User` which is declared to `include PassiveRecord` will gain the following class methods:
+  - `User.create(attrs_hash)`
+  - `User.find(id_or_ids)`
+  - `User.find_by(conditions_hash)`
+  - `User.find_all_by(conditions_hash)`
+  - `User.all` and `User.each`
+  -  User is `Enumerable` through `User.all`, so we have `User.count`, `User.first`, etc.
+  - `User.where(conditions_hash)` (returns a `PassiveRecord::Query` object)
+  - `User.descendants`
+  - `User.destroy_all`
+
+## Relationships
+### Belongs To
+
+  A model `Child` which is declared `belongs_to :parent` will gain:
+
+  - `child.parent`
+  - `child.parent_id`
+  - `child.parent=`
+  - `child.parent_id=`
+
+### Has One
+
+  A model `Parent` which declares `has_one :child` will gain:
+
+  - `parent.child`
+  - `parent.child_id`
+  - `parent.child=`
+  - `parent.child_id=`
+  - `parent.create_child(attrs)`
+
+### Has Many
+
+  A model `Parent` which declares `has_many :children` will gain:
+
+  - `parent.children`
+  - `parent.children_ids`
+  - `parent.children=`
+  - `parent.children_ids=`
+  - `parent.create_child(attrs)`
+
+## Hooks
+
+  - `after_create :call_method`
+  - `after_update { or_use_a_block }`
+
 
 ## Copyright
 
