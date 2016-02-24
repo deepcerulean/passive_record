@@ -56,30 +56,34 @@ PassiveRecord may be right for you!
       has_many :dogs, :through => :children
     end
 
-    # Let's create some models!
+    # Let's build some models!
     parent = Parent.create
-    => Parent (id: 1)
-
+    => Parent (id: 1, child_ids: [], dog_ids: [])
+    
     child = parent.create_child
-    => Child (id: 1)
-
+    => Child (id: 1, dog_id: nil, parent_id: 1)
+    
     dog = child.create_dog
-    => Dog (id: 1)
-
-    # inverse relationships
+    => Dog (id: 1, child_id: 1)
+    
+    # Inverse relationships
     dog.child
-    => Child (id: 1)
-
+    => Child (id: 1, dog_id: 1, parent_id: 1)
+    
     Dog.find_by child: child
-    => Dog (id: 1)
-
-    # has many thru
+    => Dog (id: 1, child_id: 1)
+    
+    # Has many through
     parent.dogs
-    => [Dog (id: 1)]
-
-    # nested queries
+    => [ ...has_many :through relation... ]
+    
+    parent.dogs.all
+    => [Dog (id: 1, child_id: 1)]
+    
+    # Nested queries
     Dog.find_all_by(child: { parent: parent })
-    => [Dog (id: 1)]
+    => [Dog (id: 1, child_id: 1)]
+
 ````
 
 ## Interface
@@ -140,9 +144,6 @@ PassiveRecord may be right for you!
   - `parent.children.all?(&predicate)`
   - `parent.children.empty?`
   - `parent.children.where` (returns a `Core::Query`)
-
-## Queries
-
 
 ## Hooks
 
