@@ -144,7 +144,6 @@ PassiveRecord may be right for you!
 ## Queries
 
 
-
 ## Hooks
 
   - `after_create :call_method`
