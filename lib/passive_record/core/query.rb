@@ -18,19 +18,16 @@ module PassiveRecord
 
       def all
         return [] unless conditions
-        klass.select do |instance|
-          conditions.all? do |(field,value)|
-            if value.is_a?(Hash)
-              evaluate_nested_conditions(instance, field, value)
-            elsif value.is_a?(Range) || value.is_a?(Array)
-              value.include?(instance.send(field))
-            else
-              instance.send(field) == value
-            end
-          end
-        end
+        matching = method(:matching_instances)
+        klass.select(&matching)
       end
       def_delegators :all, :each
+
+      def matching_instances(instance)
+        conditions.all? do |(field,value)|
+          evaluate_condition(instance, field, value)
+        end
+      end
 
       def create(attrs={})
         klass.create(conditions.merge(attrs))
@@ -54,6 +51,16 @@ module PassiveRecord
         false
       end
 
+      def evaluate_condition(instance, field, value)
+        if value.is_a?(Hash)
+          evaluate_nested_conditions(instance, field, value)
+        elsif value.is_a?(Range) || value.is_a?(Array)
+          value.include?(instance.send(field))
+        else
+          instance.send(field) == value
+        end
+      end
+
       def evaluate_nested_conditions(instance, field, value)
         association = instance.send(field)
         association && value.all? do |(association_field,val)|
@@ -67,18 +74,9 @@ module PassiveRecord
     end
 
     class NegatedQuery < Query
-      def all
-        return [] unless conditions
-        klass.select do |instance|
-          conditions.none? do |(field,value)|
-            if value.is_a?(Hash)
-              evaluate_nested_conditions(instance, field, value)
-            elsif value.is_a?(Range) || value.is_a?(Array)
-              value.include?(instance.send(field))
-            else
-              instance.send(field) == value
-            end
-          end
+      def matching_instances(instance)
+        conditions.none? do |(field,value)|
+          evaluate_condition(instance, field, value)
         end
       end
 
