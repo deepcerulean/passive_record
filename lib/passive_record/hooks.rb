@@ -17,6 +17,8 @@ module PassiveRecord
         unless @block_to_invoke.nil?
           instance.instance_eval(&@block_to_invoke)
         end
+
+        instance
       end
     end
 
