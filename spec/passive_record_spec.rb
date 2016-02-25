@@ -178,7 +178,7 @@ describe "passive record models" do
           end
         end
 
-        xcontext 'queries with negations' do
+        context 'queries with negations' do
           it 'should find where attribute value is NOT equal' do
             model_a = Model.create(id: 'alpha')
             model_b = Model.create(id: 'beta')

@@ -9,6 +9,11 @@ module PassiveRecord
       def initialize(klass,conditions={})
         @klass = klass
         @conditions = conditions
+        @subqueries = []
+      end
+
+      def not(conditions={})
+        NegatedQuery.new(@klass, conditions)
       end
 
       def all
@@ -45,6 +50,10 @@ module PassiveRecord
       end
 
       protected
+      def negated?
+        false
+      end
+
       def evaluate_nested_conditions(instance, field, value)
         association = instance.send(field)
         association && value.all? do |(association_field,val)|
@@ -54,6 +63,27 @@ module PassiveRecord
             association.send(association_field) == val
           end
         end
+      end
+    end
+
+    class NegatedQuery < Query
+      def all
+        return [] unless conditions
+        klass.select do |instance|
+          conditions.none? do |(field,value)|
+            if value.is_a?(Hash)
+              evaluate_nested_conditions(instance, field, value)
+            elsif value.is_a?(Range) || value.is_a?(Array)
+              value.include?(instance.send(field))
+            else
+              instance.send(field) == value
+            end
+          end
+        end
+      end
+
+      def negated?
+        true
       end
     end
   end
