@@ -48,7 +48,7 @@ describe "passive record models" do
           child.dogs << dog
           expect(dog.inspect).to eq("Family::Dog (id: #{dog.id.inspect}, breed: \"#{dog.breed}\", created_at: #{dog.created_at}, sound: \"bark\", child_id: #{child.id.inspect})")
 
-          expect(child.inspect).to eq("Family::Child (id: #{child.id.inspect}, created_at: #{dog.created_at}, name: \"Alice\", toy_id: nil, dog_ids: [#{dog.id.inspect}], parent_id: nil)")
+          expect(child.inspect).to eq("Family::Child (id: #{child.id.inspect}, created_at: #{child.created_at}, name: \"Alice\", toy_id: nil, dog_ids: [#{dog.id.inspect}], parent_id: nil)")
         end
       end
 

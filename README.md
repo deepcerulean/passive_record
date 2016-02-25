@@ -140,7 +140,7 @@ PassiveRecord may be right for you!
   - `parent.children<<` (insert a related model)
   - `parent.children.all?(&predicate)`
   - `parent.children.empty?`
-  - `parent.children.where` (returns a `Core::Query`)
+  - `parent.children.where(conditions)` (returns a `Core::Query`)
 
 ### Relations
 

@@ -9,7 +9,6 @@ module PassiveRecord
       def initialize(klass,conditions={})
         @klass = klass
         @conditions = conditions
-        @subqueries = []
       end
 
       def not(conditions={})
@@ -55,10 +54,6 @@ module PassiveRecord
       end
 
       protected
-      def negated?
-        false
-      end
-
       def evaluate_condition(instance, field, value)
         if value.is_a?(Hash)
           evaluate_nested_conditions(instance, field, value)
@@ -86,10 +81,6 @@ module PassiveRecord
         conditions.none? do |(field,value)|
           evaluate_condition(instance, field, value)
         end
-      end
-
-      def negated?
-        true
       end
     end
   end
