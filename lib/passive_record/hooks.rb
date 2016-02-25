@@ -45,6 +45,19 @@ module PassiveRecord
       self
     end
 
+
+    def before_update_hooks
+      @hooks ||= []
+      @hooks.select { |hook| hook.kind == :before_update }
+    end
+
+    def before_update(*meth_syms, &blk)
+      hook = Hook.new(:before_update,*meth_syms,&blk)
+      @hooks ||= []
+      @hooks += [ hook ]
+      self
+    end
+
     def after_update_hooks
       @hooks ||= []
       @hooks.select { |hook| hook.kind == :after_update }

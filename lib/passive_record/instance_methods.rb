@@ -1,6 +1,10 @@
 module PassiveRecord
   module InstanceMethods
     def update(attrs={})
+      self.class.before_update_hooks.each do |hook|
+        hook.run(self)
+      end
+
       attrs.each do |k,v|
         send("#{k}=", v)
       end
@@ -8,6 +12,8 @@ module PassiveRecord
       self.class.after_update_hooks.each do |hook|
         hook.run(self)
       end
+
+      self
     end
 
     # from http://stackoverflow.com/a/8417341/90042
