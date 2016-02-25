@@ -195,6 +195,7 @@ describe "passive record models" do
             expect(Post.recent).not_to include(post)
             expect(Post.recent).to include(another_post)
             expect(Post.where.not.recent).to include(another_post)
+            expect(Post.where.not.recent).not_to include(post)
           end
         end
       end
