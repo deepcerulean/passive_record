@@ -149,7 +149,6 @@ describe "passive record models" do
           end
 
           it 'should find a single record through a nested query' do
-            # post_again = Post.find_by comments: { user: user }
             expect(post).to eq(posts_with_comment_by_user)
           end
 
@@ -159,7 +158,6 @@ describe "passive record models" do
 
             posts = Post.find_all_by comments: { user: user }
             expect(posts.count).to eq(2)
-            # expect(posts).to eq([post,another_post])
           end
         end
 
@@ -217,7 +215,7 @@ describe "passive record models" do
         another_toy = another_child.create_toy
         expect(another_toy.child).to eq(another_child)
       end
-      
+
       it 'should assign parents' do
         toy = Toy.create
         toy.child = child
