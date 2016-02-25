@@ -155,7 +155,7 @@ PassiveRecord may be right for you!
 
 ### Queries
 
-  `Core::Query` objects acquired through `where` are chainable, accept nested queries, and have the following public methods:
+  `Core::Query` objects acquired through `where` are chainable, accept nested queries and scopes, and have the following public methods:
 
   - `where(conditions).all`
   - `where(conditions).each` enumerates over `where(conditions).all`, so we have `where(conditions).count`, `where(conditions).first`, etc.
@@ -163,6 +163,7 @@ PassiveRecord may be right for you!
   - `where(conditions).first_or_create(attrs)`
   - `where(conditions).where(further_conditions)` (chaining)
   - `where.not(conditions)` (negation)
+  - `where.scope` (scoping with model class methods that return a query)
 
 ## Hooks
 
