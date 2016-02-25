@@ -45,8 +45,8 @@ module PassiveRecord
       end
     end
 
-    def where(conditions)
-      Query.new(self, conditions)
+    def where(conditions={})
+      Query.new(self, conditions={})
     end
 
     def create(attrs={})

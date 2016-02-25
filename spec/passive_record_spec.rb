@@ -176,7 +176,16 @@ describe "passive record models" do
             Model.create(id: 12)
             expect(Model.find_all_by(id: [10,11])).to eq([model_a, model_b])
           end
+        end
 
+        xcontext 'queries with negations' do
+          it 'should find where attribute value is NOT equal' do
+            model_a = Model.create(id: 'alpha')
+            model_b = Model.create(id: 'beta')
+
+            expect(Model.where.not(id: 'alpha').first).to eq(model_b)
+            expect(Model.where.not(id: 'beta').first).to eq(model_a)
+          end
         end
       end
     end
