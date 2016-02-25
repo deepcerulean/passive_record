@@ -35,7 +35,7 @@ PassiveRecord may be right for you!
 
 ## Examples
 
-````ruby
+    ````ruby
     require 'passive_record'
 
     class Model
@@ -83,9 +83,9 @@ PassiveRecord may be right for you!
     # Nested queries
     Dog.find_all_by(child: { parent: parent })
     => [Dog (id: 1, child_id: 1)]
-````
+    ````
 
-## Interface
+## PassiveRecord API
 
   A class including PassiveRecord will gain the following new instance and class methods.
 
@@ -108,8 +108,6 @@ PassiveRecord may be right for you!
   - `User.where(conditions_hash)` (returns a `PassiveRecord::Query` object)
   - `User.descendants`
   - `User.destroy_all`
-
-## Relationships
 
 ### Belongs To
 
@@ -144,9 +142,9 @@ PassiveRecord may be right for you!
   - `parent.children.empty?`
   - `parent.children.where` (returns a `Core::Query`)
 
-### Explicit Relations
+### Relations
 
-  Parent models which declare `has_many :children` gain a `parent.children` instance that returns an explicit PassiveRecord relation object, which has the following public interface:
+  Parent models which declare `has_many :children` gain a `parent.children` instance that returns an explicit PassiveRecord relation object, which has the following public methods:
 
   - `parent.children.all`
   - `parent.children.each` enumerates over `parent.children.all`, giving `parent.children.count`, `parent.children.first`, etc.
@@ -157,13 +155,14 @@ PassiveRecord may be right for you!
 
 ### Queries
 
-  `Core::Query` objects acquired through `where` are chainable and have their own API.
+  `Core::Query` objects acquired through `where` are chainable, accept nested queries, and have the following public methods:
 
   - `where(conditions).all`
   - `where(conditions).each` enumerates over `where(conditions).all`, so we have `where(conditions).count`, `where(conditions).first`, etc.
   - `where(conditions).create(attrs)`
   - `where(conditions).first_or_create(attrs)`
   - `where(conditions).where(further_conditions)` (chaining)
+  - `where.not(conditions)` (negation)
 
 ## Hooks
 
