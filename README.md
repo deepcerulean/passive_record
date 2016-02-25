@@ -35,7 +35,7 @@ PassiveRecord may be right for you!
 
 ## Examples
 
-    ````ruby
+````ruby
     require 'passive_record'
 
     class Model
@@ -83,7 +83,7 @@ PassiveRecord may be right for you!
     # Nested queries
     Dog.find_all_by(child: { parent: parent })
     => [Dog (id: 1, child_id: 1)]
-    ````
+````
 
 ## PassiveRecord API
 
