@@ -162,6 +162,24 @@ describe "passive record models" do
             # expect(posts).to eq([post,another_post])
           end
         end
+
+        context 'queries with ranges' do
+          let(:model) { Model.create }
+          it 'should find where attribute value is in range' do
+            model.created_at = 2.days.ago
+            expect(Model.find_by(created_at: 3.days.ago..1.day.ago)).to eq(model)
+          end
+        end
+
+        context 'queries with arrays (subset)' do
+          it 'should find where attribute value is included in subset' do
+            model_a = Model.create(id: 10)
+            model_b = Model.create(id: 11)
+            Model.create(id: 12)
+            expect(Model.find_all_by(id: [10,11])).to eq([model_a, model_b])
+          end
+
+        end
       end
     end
   end

@@ -17,6 +17,8 @@ module PassiveRecord
           conditions.all? do |(field,value)|
             if value.is_a?(Hash)
               evaluate_nested_conditions(instance, field, value)
+            elsif value.is_a?(Range) || value.is_a?(Array)
+              value.include?(instance.send(field))
             else
               instance.send(field) == value
             end

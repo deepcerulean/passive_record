@@ -7,7 +7,7 @@ require 'passive_record'
 
 class Model
   include PassiveRecord
-  attr_reader :created_at
+  attr_accessor :created_at
   after_create { @created_at = Time.now }
 end
 

@@ -45,7 +45,6 @@ module PassiveRecord
       self
     end
 
-
     def before_update_hooks
       @hooks ||= []
       @hooks.select { |hook| hook.kind == :before_update }
