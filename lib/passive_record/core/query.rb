@@ -46,6 +46,14 @@ module PassiveRecord
         @klass == other_query.klass && @conditions == other_query.conditions
       end
 
+      def method_missing(meth,*args,&blk)
+        if klass.methods.include?(meth)
+          klass.send(meth,*args,&blk)
+        else
+          super(meth,*args,&blk)
+        end
+      end
+
       protected
       def negated?
         false

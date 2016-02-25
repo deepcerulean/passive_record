@@ -187,6 +187,16 @@ describe "passive record models" do
             expect(Model.where.not(id: 'beta').first).to eq(model_a)
           end
         end
+
+        context 'queries with scopes' do
+          it 'should find using class method' do
+            post = Post.create(published_at: 10.days.ago)
+            another_post = Post.create(published_at: 2.days.ago)
+            expect(Post.recent).not_to include(post)
+            expect(Post.recent).to include(another_post)
+            expect(Post.where.not.recent).to include(another_post)
+          end
+        end
       end
     end
   end
