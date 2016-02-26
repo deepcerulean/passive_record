@@ -18,7 +18,6 @@ module PassiveRecord
 
     def destroy
       self.class.destroy(self.id)
-      freeze
     end
 
     # from http://stackoverflow.com/a/8417341/90042
@@ -64,7 +63,7 @@ module PassiveRecord
     private
 
     def relata
-      self.class.associations&.map do |assn|
+      @_relata ||= self.class.associations&.map do |assn|
         assn.to_relation(self)
       end || []
     end

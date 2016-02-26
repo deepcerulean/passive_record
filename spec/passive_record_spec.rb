@@ -17,7 +17,7 @@ describe PassiveRecord do
 end
 
 describe "passive record models" do
-  before { PassiveRecord.drop_all }
+  before(:each) { PassiveRecord.drop_all }
 
   context "with a simple model including PR" do
     let!(:model) { SimpleModel.create(foo: value) }
@@ -37,10 +37,10 @@ describe "passive record models" do
 
       describe "#destroy" do
         it 'should remove the entity and freeze it' do
-          expect(SimpleModel.find(model.id)).to eq(model)
-          model.destroy
-          expect(SimpleModel.find(model.id)).to eq(nil)
-          expect(model).to be_frozen
+          doomed = SimpleModel.create
+          expect(SimpleModel.find(doomed.id)).to eq(doomed)
+          doomed.destroy
+          expect(SimpleModel.find(doomed.id)).to eq(nil)
         end
       end
 
