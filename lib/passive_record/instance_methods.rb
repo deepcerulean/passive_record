@@ -16,6 +16,11 @@ module PassiveRecord
       self
     end
 
+    def destroy
+      self.class.destroy(self.id)
+      freeze
+    end
+
     # from http://stackoverflow.com/a/8417341/90042
     def to_h
       Hash[
@@ -59,7 +64,7 @@ module PassiveRecord
     private
 
     def relata
-      @_relata ||= self.class.associations&.map do |assn|
+      self.class.associations&.map do |assn|
         assn.to_relation(self)
       end || []
     end
@@ -97,7 +102,7 @@ module PassiveRecord
       when "#{target_name}="
         if args.first.is_a?(Array)
           if matching_relation.is_a?(Associations::HasManyThroughRelation)
-            intermediary = matching_relation.intermediary_relation 
+            intermediary = matching_relation.intermediary_relation
             args.first.each do |child|
               intermediary.
                 where((target_name.singularize + "_id").to_sym => child.id).

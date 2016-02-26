@@ -72,6 +72,10 @@ module PassiveRecord
       instance
     end
 
+    def destroy(id)
+      @instances.delete(id)
+    end
+
     def destroy_all
       @instances = {}
     end

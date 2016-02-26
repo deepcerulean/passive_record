@@ -35,6 +35,15 @@ describe "passive record models" do
         end
       end
 
+      describe "#destroy" do
+        it 'should remove the entity and freeze it' do
+          expect(SimpleModel.find(model.id)).to eq(model)
+          model.destroy
+          expect(SimpleModel.find(model.id)).to eq(nil)
+          expect(model).to be_frozen
+        end
+      end
+
       describe "#inspect" do
         it 'should report attribute details' do
           expect(model.inspect).to eq("SimpleModel (id: #{model.id.inspect}, foo: \"foo_value\")")
