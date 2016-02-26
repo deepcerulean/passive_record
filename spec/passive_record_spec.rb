@@ -189,13 +189,29 @@ describe "passive record models" do
         end
 
         context 'queries with scopes' do
-          it 'should find using class method' do
-            post = Post.create(published_at: 10.days.ago)
-            another_post = Post.create(published_at: 2.days.ago)
-            expect(Post.recent).not_to include(post)
-            expect(Post.recent).to include(another_post)
-            expect(Post.where.not.recent).to include(another_post)
-            expect(Post.where.not.recent).not_to include(post)
+          let(:post) { Post.create(published_at: 10.days.ago) }
+          let(:another_post) {Post.create(published_at: 2.days.ago)}
+
+          describe 'should restrict using class method' do
+            it 'should use a class method as a scope' do
+              expect(Post.recent).not_to include(post)
+              expect(Post.recent).to include(another_post)
+            end
+
+            it 'should negate a nullary scope' do
+              expect(Post.where.not.recent).to include(post)
+              expect(Post.where.not.recent).not_to include(another_post)
+            end
+
+            it 'should use a class method with an argument as a scope' do
+              expect(Post.where.published_within_days(3)).not_to include(post)
+              expect(Post.where.published_within_days(3)).to include(another_post)
+            end
+
+            it 'should negate a scope with an argument' do
+              expect(Post.where.not.published_within_days(3)).to include(post)
+              expect(Post.where.not.published_within_days(3)).not_to include(another_post)
+            end
           end
         end
       end

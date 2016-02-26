@@ -9,6 +9,7 @@ module PassiveRecord
       def initialize(klass,conditions={})
         @klass = klass
         @conditions = conditions
+        @scope = nil
       end
 
       def not(conditions={})
@@ -18,7 +19,15 @@ module PassiveRecord
       def all
         return [] unless conditions
         matching = method(:matching_instances)
-        klass.select(&matching)
+        if @scope
+          if negated?
+            klass.reject(&@scope.method(:matching_instances))
+          else
+            klass.select(&@scope.method(:matching_instances))
+          end
+        else
+          klass.select(&matching)
+        end
       end
       def_delegators :all, :each
 
@@ -45,9 +54,16 @@ module PassiveRecord
         @klass == other_query.klass && @conditions == other_query.conditions
       end
 
+      def negated?
+        false
+      end
+
       def method_missing(meth,*args,&blk)
         if klass.methods.include?(meth)
-          klass.send(meth,*args,&blk)
+          # okay, so this thing is a query
+          # and we need to 'compose' with it somehow
+          @scope = klass.send(meth,*args,&blk)
+          self
         else
           super(meth,*args,&blk)
         end
@@ -81,6 +97,10 @@ module PassiveRecord
         conditions.none? do |(field,value)|
           evaluate_condition(instance, field, value)
         end
+      end
+
+      def negated?
+        true
       end
     end
   end

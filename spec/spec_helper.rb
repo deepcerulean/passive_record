@@ -87,7 +87,7 @@ class Role < Model
   has_and_belongs_to_many :users
 end
 
-### 
+###
 
 class Post < Model
   has_many :comments 
@@ -95,7 +95,14 @@ class Post < Model
 
   attr_accessor :published_at
   before_create { @published_at = Time.now }
-  def self.recent; where(:published_at => 3.days.ago..Time.now) end
+
+  def self.recent
+    where(:published_at => 3.days.ago..Time.now) 
+  end
+
+  def self.published_within_days(n)
+    where(:published_at => n.days.ago..Time.now) 
+  end
 end
 
 class User < Model
