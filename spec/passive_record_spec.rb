@@ -26,7 +26,8 @@ describe "passive record models" do
     describe "instance methods" do
       describe "#update" do
         it 'should update attrs' do
-          expect {model.update(foo: '123')}.to change {model.foo}.from(value).to('123')
+          expect {model.update(foo: '123')}.
+            to change {model.foo}.from(value).to('123')
         end
 
         it 'should invoke callbacks' do

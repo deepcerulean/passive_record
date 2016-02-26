@@ -99,15 +99,17 @@ PassiveRecord may be right for you!
 ### Class Methods
 
   A class `User` which is declared to `include PassiveRecord` will gain the following class methods:
-  - `User.create(attrs_hash)`
-  - `User.find(id_or_ids)`
-  - `User.find_by(conditions_hash)`
-  - `User.find_all_by(conditions_hash)`
+
   - `User.all` and `User.each`
-  - `User.each` enumerates over `User.all`, giving `User.count`, `User.first`, etc.
-  - `User.where(conditions_hash)` (returns a `PassiveRecord::Query` object)
+  - `User.create(attrs_hash)`
   - `User.descendants`
+  - `User.destroy(id)`
   - `User.destroy_all`
+  - `User.each` enumerates over `User.all`, giving `User.count`, `User.first`, etc.
+  - `User.find(id_or_ids)`
+  - `User.find_all_by(conditions_hash)`
+  - `User.find_by(conditions_hash)`
+  - `User.where(conditions_hash)` (returns a `PassiveRecord::Query` object)
 
 ### Belongs To
 
@@ -133,11 +135,11 @@ PassiveRecord may be right for you!
   A model `Parent` which declares `has_many :children` or `has_and_belongs_to_many :children` will gain:
 
   - `parent.children` (returns a `Relation`, documented below)
-  - `parent.children_ids`
   - `parent.children=`
+  - `parent.children_ids`
   - `parent.children_ids=`
+  - `parent.children<<`
   - `parent.create_child(attrs)`
-  - `parent.children<<` (insert a related model)
   - `parent.children.all?(&predicate)`
   - `parent.children.empty?`
   - `parent.children.where(conditions)` (returns a `Core::Query`)
