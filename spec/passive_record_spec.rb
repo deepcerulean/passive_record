@@ -396,6 +396,7 @@ describe "passive record models" do
     end
 
     context 'direct habtm' do
+      before(:each) { PassiveRecord.drop_all }
       let!(:user) { User.create roles: [role] }
       let(:role) { Role.create }
       let(:another_user) { User.create }
@@ -405,8 +406,11 @@ describe "passive record models" do
         expect(user.roles).to include(role)
         expect(role.user_ids).to eq([user.id])
         expect(user.role_ids).to eq([role.id])
-
         expect {role.users << another_user}.to change{role.users.count}.by(1)
+      end
+
+      it 'should handle inverse relations' do
+        expect {role.users << another_user}.to change{another_user.roles.count}.by(1)
       end
     end
   end
