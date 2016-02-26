@@ -1,8 +1,7 @@
 # passive_record
 
-* [Homepage](https://rubygems.org/gems/passive_record)
-* [Documentation](http://rubydoc.info/gems/passive_record/frames)
-* [Email](mailto:jweissman1986 at gmail.com)
+* [Documentation](https://rubygems.org/gems/passive_record)
+* [Email](mailto:joe at deepc.io)
 
 [![Code Climate GPA](https://codeclimate.com/github/deepcerulean/passive_record/badges/gpa.svg)](https://codeclimate.com/github/deepcerulean/passive_record)
 [![Codeship Status for deepcerulean/passive_record](https://www.codeship.io/projects/66bb2d90-ba61-0133-af95-025ac38368ea/status)](https://codeship.com/projects/128700)
