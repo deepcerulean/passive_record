@@ -39,9 +39,12 @@ describe "passive record models" do
       describe "#destroy" do
         it 'should remove the entity and freeze it' do
           doomed = SimpleModel.create
-          expect(SimpleModel.find(doomed.id)).to eq(doomed)
+          doomed_id = doomed.id
+          expect(SimpleModel.find(doomed_id)).to eq(doomed)
           doomed.destroy
-          expect(SimpleModel.find(doomed.id)).to eq(nil)
+          expect(SimpleModel.find(doomed_id)).to eq(nil)
+
+          expect{10.times{SimpleModel.create}}.to change{SimpleModel.count}.by(10)
         end
       end
 
@@ -52,13 +55,16 @@ describe "passive record models" do
 
         it 'should report relations' do
           dog = Dog.create
-          expect(dog.inspect).to eq("Family::Dog (id: #{dog.id.inspect}, breed: \"#{dog.breed}\", created_at: #{dog.created_at}, sound: \"bark\", child_id: nil)")
+          expect(dog.inspect).
+            to eq("Family::Dog (id: #{dog.id.inspect}, breed: \"#{dog.breed}\", created_at: #{dog.created_at}, sound: \"bark\", child_id: nil)")
 
           child = Child.create
           child.dogs << dog
-          expect(dog.inspect).to eq("Family::Dog (id: #{dog.id.inspect}, breed: \"#{dog.breed}\", created_at: #{dog.created_at}, sound: \"bark\", child_id: #{child.id.inspect})")
+          expect(dog.inspect).
+            to eq("Family::Dog (id: #{dog.id.inspect}, breed: \"#{dog.breed}\", created_at: #{dog.created_at}, sound: \"bark\", child_id: #{child.id.inspect})")
 
-          expect(child.inspect).to eq("Family::Child (id: #{child.id.inspect}, created_at: #{child.created_at}, name: \"Alice\", toy_id: nil, dog_ids: [#{dog.id.inspect}], parent_id: nil)")
+          expect(child.inspect).
+            to eq("Family::Child (id: #{child.id.inspect}, created_at: #{child.created_at}, name: \"Alice\", toy_id: nil, dog_ids: [#{dog.id.inspect}], parent_id: nil)")
         end
       end
 

@@ -73,7 +73,7 @@ module PassiveRecord
     end
 
     def destroy(id)
-      @instances.delete(id)
+      @instances = instances_by_id.reject{|k,_| id == k }
     end
 
     def destroy_all

@@ -86,9 +86,11 @@ PassiveRecord may be right for you!
 
 ## PassiveRecord API
 
+
   A class including PassiveRecord will gain the following new instance and class methods.
 
 ### Instance Methods
+
 
   A class `Role` which is declared to `include PassiveRecord` will gain the following instance methods:
   - `role.update(attrs_hash)`
@@ -96,6 +98,7 @@ PassiveRecord may be right for you!
   - We override `role.inspect` to show ID and visible attributes
 
 ### Class Methods
+
 
   A class `User` which is declared to `include PassiveRecord` will gain the following class methods:
 
