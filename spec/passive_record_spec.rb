@@ -273,6 +273,9 @@ describe "passive record models" do
         toy = Toy.create
         toy.child = child
         expect(child.toy).to eq(toy)
+
+        child.toy = Toy.create
+        expect(child.toy).not_to eq(toy)
       end
     end
 

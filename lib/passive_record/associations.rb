@@ -25,17 +25,52 @@ module PassiveRecord
       target_class_name = opts.delete(:class_name) { (parent_name_sym.to_s).split('_').map(&:capitalize).join }
       association = BelongsToAssociation.new(self, target_class_name, parent_name_sym)
       associate!(association)
+
+      define_method(parent_name_sym) do
+        relation = instance_eval{relata}.detect { |rel| rel.association == association }
+        association.parent_class.find(relation.parent_model_id)
+      end
+
+      define_method(:"#{parent_name_sym}=") do |new_parent|
+        send(:"#{parent_name_sym}_id=", new_parent.id)
+      end
+
+      define_method(:"#{parent_name_sym}_id=") do |new_parent_id|
+        relation = instance_eval{relata}.detect { |rel| rel.association == association }
+        relation.parent_model_id = new_parent_id
+      end
     end
 
     def has_one(child_name_sym)
       child_class_name = (child_name_sym.to_s).split('_').map(&:capitalize).join
       association = HasOneAssociation.new(self, child_class_name, child_name_sym)
       associate!(association)
+
+      define_method(child_name_sym) do
+        relation = instance_eval{relata}.detect { |rel| rel.association == association }
+        relation.lookup
+      end
+
+      define_method(:"#{child_name_sym}=") do |new_child|
+        # relation = instance_eval{relata}.detect { |rel| rel.association == association }
+        send(:"#{child_name_sym}_id=", new_child.id)
+      end
+
+      define_method(:"#{child_name_sym}_id=") do |new_child_id|
+        relation = instance_eval{relata}.detect { |rel| rel.association == association }
+        # detach existing child...
+        relation.lookup.send(:"#{relation.parent_model_id_field}=", nil)
+
+        relation.child_class.
+          find(new_child_id).
+          update(relation.parent_model_id_field => relation.id)
+      end
     end
 
     def has_many(collection_name_sym, opts={})
       target_class_name = opts.delete(:class_name) { (collection_name_sym.to_s).split('_').map(&:capitalize).join }
 
+      association = nil
       if opts.key?(:through)
         through_class_collection_name = opts.delete(:through)
 
@@ -45,10 +80,47 @@ module PassiveRecord
         association = HasManyThroughAssociation.new(self, target_class_name, collection_name_sym, through_class_collection_name, base_association)
 
         associate!(association)
+
+        define_method(:"#{collection_name_sym}=") do |new_collection|
+          relation = instance_eval{relata}.detect { |rel| rel.association == association }
+
+          intermediary = relation.intermediary_relation
+
+          # drop all intermediary relations
+          intermediary.where( relation.parent_model_id_field => relation.id ).each do |intermediate|
+            intermediate.destroy
+          end
+
+          # add in new ones...
+          target_name = relation.association.target_name_symbol.to_s
+          new_collection.each do |child|
+            intermediary.create(target_name.singularize + "_id" => child.id, relation.parent_model_id_field => relation.id )
+          end
+        end
       else
         association = HasManyAssociation.new(self, target_class_name, collection_name_sym)
         associate!(association)
+
+        define_method(:"#{collection_name_sym}=") do |new_collection|
+          relation = instance_eval{relata}.detect { |rel| rel.association == association }
+
+          # detach existing children...
+          relation.all.each do |child|
+            child.send(:"#{relation.parent_model_id_field}=", nil)
+          end
+
+          # reattach new children
+          new_collection.each do |child|
+            child.send(:"#{relation.parent_model_id_field}=", relation.id)
+          end
+        end
       end
+
+      define_method(collection_name_sym) do
+        relation = instance_eval{relata}.detect { |rel| rel.association == association }
+        relation
+      end
+
     end
 
     def has_and_belongs_to_many(collection_name_sym)

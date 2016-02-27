@@ -77,8 +77,8 @@ module PassiveRecord
     def possible_target_names(relation)
       target_name = relation.association.target_name_symbol.to_s
       [
-        target_name,
-        "#{target_name}=",
+        # target_name,
+        # "#{target_name}=",
         "#{target_name}_id",
         "#{target_name}_ids",
         "#{target_name.singularize}_ids",
@@ -92,29 +92,29 @@ module PassiveRecord
       target_name = matching_relation.association.target_name_symbol.to_s
 
       case meth.to_s
-      when target_name
-        if matching_relation.singular?
-          matching_relation.lookup
-        else
-          matching_relation
-        end
-      when "#{target_name}="
-        if args.first.is_a?(Array)
-          if matching_relation.is_a?(Associations::HasManyThroughRelation)
-            intermediary = matching_relation.intermediary_relation
-            args.first.each do |child|
-              intermediary.
-                where((target_name.singularize + "_id").to_sym => child.id).
-                first_or_create
-            end
-          else
-            args.first.each do |child|
-              child.send(matching_relation.parent_model_id_field + "=", id)
-            end
-          end
-        else
-          matching_relation.parent_model_id = args.first.id
-        end
+      # when target_name
+      #   if matching_relation.singular?
+      #     matching_relation.lookup
+      #   else
+      #     matching_relation
+      #   end
+      # when "#{target_name}="
+      #   if args.first.is_a?(Array)
+      #     if matching_relation.is_a?(Associations::HasManyThroughRelation)
+      #       intermediary = matching_relation.intermediary_relation
+      #       args.first.each do |child|
+      #         intermediary.
+      #           where((target_name.singularize + "_id").to_sym => child.id).
+      #           first_or_create
+      #       end
+      #     else
+      #       args.first.each do |child|
+      #         child.send(matching_relation.parent_model_id_field + "=", id)
+      #       end
+      #     end
+      #   else
+      #     matching_relation.parent_model_id = args.first.id
+      #   end
       when "create_#{target_name}", "create_#{target_name.singularize}"
         matching_relation.create(*args)
       when "#{target_name}_id"
