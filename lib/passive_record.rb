@@ -40,18 +40,4 @@ module PassiveRecord
   def self.drop_all
     (model_classes + model_classes.flat_map(&:descendants)).each(&:destroy_all)
   end
-
-  def self.configure
-    yield configuration
-  end
-
-  def self.configuration
-    @config ||= default_configuration
-  end
-
-  def self.default_configuration
-    OpenStruct.new(
-      :identify_using => Identifier
-    )
-  end
 end

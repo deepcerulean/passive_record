@@ -53,7 +53,7 @@ module PassiveRecord
       instance = new
 
       instance.singleton_class.class_eval { attr_accessor :id }
-      instance.send(:"id=", id_factory.generate(self))
+      instance.send(:"id=", SecureRandomIdentifier.generate(self))
 
       register(instance)
 
@@ -73,7 +73,7 @@ module PassiveRecord
     end
 
     def destroy(id)
-      @instances = instances_by_id.reject{|k,_| id == k }
+      @instances.reject! {|k,_| id == k }
     end
 
     def destroy_all

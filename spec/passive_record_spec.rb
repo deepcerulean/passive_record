@@ -44,6 +44,7 @@ describe "passive record models" do
           doomed.destroy
           expect(SimpleModel.find(doomed_id)).to eq(nil)
 
+          SimpleModel.destroy_all
           expect{10.times{SimpleModel.create}}.to change{SimpleModel.count}.by(10)
         end
       end
@@ -423,23 +424,9 @@ describe "passive record models" do
 end
 
 describe "configuration" do
-  describe 'configuring id factory' do
-    context 'with default config' do
-      it 'should generate simple identifiers' do
-        expect(Model.create.id).to be_a(PassiveRecord::Identifier)
-      end
-    end
-
-    context 'with a new id factory configured' do
-      before do
-        PassiveRecord.configure do |passive_records|
-          passive_records.identify_using = PassiveRecord::SecureRandomIdentifier
-        end
-      end
-
-      it 'should generate uuids' do
-        expect(Model.create.id).to be_a(PassiveRecord::SecureRandomIdentifier)
-      end
+  context 'with default config' do
+    it 'should generate simple identifiers' do
+      expect(Model.create.id).to be_a(PassiveRecord::SecureRandomIdentifier)
     end
   end
 end
