@@ -26,6 +26,10 @@ module PassiveRecord
       association = BelongsToAssociation.new(self, target_class_name, parent_name_sym)
       associate!(association)
 
+      define_method(:"#{parent_name_sym}_id") do
+        send(parent_name_sym)&.id
+      end
+
       define_method(parent_name_sym) do
         relation = instance_eval{relata}.detect { |rel| rel.association == association }
         association.parent_class.find(relation.parent_model_id)
@@ -46,13 +50,21 @@ module PassiveRecord
       association = HasOneAssociation.new(self, child_class_name, child_name_sym)
       associate!(association)
 
+      define_method(:"#{child_name_sym}_id") do
+        send(child_name_sym)&.id
+      end
+
       define_method(child_name_sym) do
         relation = instance_eval{relata}.detect { |rel| rel.association == association }
         relation.lookup
       end
 
+      define_method(:"create_#{child_name_sym}") do |attrs={}|
+        relation = instance_eval{relata}.detect { |rel| rel.association == association }
+        relation.create(attrs)
+      end
+
       define_method(:"#{child_name_sym}=") do |new_child|
-        # relation = instance_eval{relata}.detect { |rel| rel.association == association }
         send(:"#{child_name_sym}_id=", new_child.id)
       end
 
@@ -77,7 +89,8 @@ module PassiveRecord
         through_class_name = (through_class_collection_name.to_s).split('_').map(&:capitalize).join
         base_association = associations.detect { |assn| assn.child_class_name == through_class_name }
 
-        association = HasManyThroughAssociation.new(self, target_class_name, collection_name_sym, through_class_collection_name, base_association)
+        association = HasManyThroughAssociation.new(
+          self, target_class_name, collection_name_sym, through_class_collection_name, base_association)
 
         associate!(association)
 
@@ -101,6 +114,7 @@ module PassiveRecord
         association = HasManyAssociation.new(self, target_class_name, collection_name_sym)
         associate!(association)
 
+
         define_method(:"#{collection_name_sym}=") do |new_collection|
           relation = instance_eval{relata}.detect { |rel| rel.association == association }
 
@@ -121,6 +135,14 @@ module PassiveRecord
         relation
       end
 
+      define_method(:"#{collection_name_sym.to_s.singularize}_ids") do
+        send(collection_name_sym).map(&:id)
+      end
+
+      define_method(:"create_#{collection_name_sym.to_s.singularize}") do |attrs={}|
+        relation = instance_eval{relata}.detect { |rel| rel.association == association }
+        relation.create(attrs)
+      end
     end
 
     def has_and_belongs_to_many(collection_name_sym)

@@ -312,7 +312,7 @@ describe "passive record models" do
 
         expect(child.id).not_to eq(another_child.id)
         expect(parent.children.all).to eq([child, another_child])
-        expect(parent.children_ids).to eq([child.id, another_child.id])
+        expect(parent.child_ids).to eq([child.id, another_child.id])
       end
     end
 
