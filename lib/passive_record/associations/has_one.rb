@@ -30,15 +30,15 @@ module PassiveRecord
       end
 
       def parent_model_id_field
-        parent_class_name + "_id"
-      end
-
-      def parent_class_name
-        association.parent_class.name.split('::').last.underscore
+        association.parent_class.name.demodulize.underscore + "_id"
       end
 
       def child_class
-        Object.const_get(association.child_class_name.singularize)
+        # look in same module as parent...
+	module_name = association.parent_class.name.deconstantize
+	module_name = "Object" if module_name.empty?
+	(module_name.constantize).
+	  const_get(association.child_class_name.singularize)
       end
 
       def id

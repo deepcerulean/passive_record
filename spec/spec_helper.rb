@@ -49,7 +49,7 @@ module Family
     has_many :toys, :through => :children
   end
 end
-include Family
+#include Family
 
 ###
 

@@ -55,11 +55,11 @@ describe "passive record models" do
         end
 
         it 'should report relations' do
-          dog = Dog.create
+          dog = Family::Dog.create
           expect(dog.inspect).
             to eq("Family::Dog (id: #{dog.id.inspect}, breed: \"#{dog.breed}\", created_at: #{dog.created_at}, sound: \"bark\", child_id: nil)")
 
-          child = Child.create
+          child = Family::Child.create
           child.dogs << dog
           expect(dog.inspect).
             to eq("Family::Dog (id: #{dog.id.inspect}, breed: \"#{dog.breed}\", created_at: #{dog.created_at}, sound: \"bark\", child_id: #{child.id.inspect})")
@@ -238,27 +238,27 @@ describe "passive record models" do
   context 'hooks' do
     context 'after create hooks' do
       it 'should use a symbol to invoke a method' do
-        expect(Child.create.name).to eq("Alice")
+        expect(Family::Child.create.name).to eq("Alice")
       end
 
       it 'should use a block' do
-        expect(Dog.create.sound).to eq("bark")
+        expect(Family::Dog.create.sound).to eq("bark")
       end
 
       it 'should use an inherited block' do
-        expect(Parent.create.created_at).to be_a(Time)
+        expect(Family::Parent.create.created_at).to be_a(Time)
       end
     end
   end
 
   context 'associations' do
     context 'one-to-one relationships' do
-      let(:child) { Child.create }
-      let(:another_child) { Child.create }
+      let(:child) { Family::Child.create }
+      let(:another_child) { Family::Child.create }
 
       it 'should create children' do
-        expect { child.create_toy }.to change { Toy.count }.by(1)
-        expect(child.toy).to eq(Toy.last)
+        expect { child.create_toy }.to change { Family::Toy.count }.by(1)
+        expect(child.toy).to eq(Family::Toy.last)
       end
 
       it 'should have inverse relationships' do
@@ -270,23 +270,23 @@ describe "passive record models" do
       end
 
       it 'should assign parents' do
-        toy = Toy.create
+        toy = Family::Toy.create
         toy.child = child
         expect(child.toy).to eq(toy)
 
-        child.toy = Toy.create
+        child.toy = Family::Toy.create
         expect(child.toy).not_to eq(toy)
       end
     end
 
     context 'one-to-many relationships' do
-      let(:parent) { Parent.create }
-      let(:another_parent) { Parent.create(children: [another_child]) }
-      let(:another_child) { Child.create }
+      let(:parent) { Family::Parent.create }
+      let(:another_parent) { Family::Parent.create(children: [another_child]) }
+      let(:another_child) { Family::Child.create }
 
       describe "#xxx<<" do
         it 'should create children with <<' do
-          child = Child.create
+          child = Family::Child.create
           expect {parent.children << child}.to change{parent.children.count}.by(1)
           expect(parent.children).to include(child)
         end
@@ -294,8 +294,8 @@ describe "passive record models" do
 
       describe "#create_xxx" do
         it 'should create children' do
-          expect { parent.create_child }.to change{ Child.count }.by(1)
-          expect(parent.children).to all(be_a(Child))
+          expect { parent.create_child }.to change{ Family::Child.count }.by(1)
+          expect(parent.children).to all(be_a(Family::Child))
         end
       end
 
@@ -317,32 +317,33 @@ describe "passive record models" do
     end
 
     context 'one-to-many through relationships' do
-      let(:parent) { Parent.create }
+      let(:parent) { Family::Parent.create }
       let(:child) { parent.create_child }
 
       it 'should collect children of children' do
         child.create_dog(breed: 'mutt')
-        expect(parent.dogs.all).to all(be_a(Dog))
+        expect(parent.dogs.all).to all(be_a(Family::Dog))
         expect(parent.dogs.count).to eq(1)
         expect(parent.dogs.first).to eq(child.dogs.first)
         expect(parent.dog_ids).to eq([child.dogs.first.id])
       end
 
       it 'should chain where clauses' do
-        child.create_dog(breed: 'mutt')
-        child.create_dog(breed: 'pit')
+        mutt = child.create_dog(breed: 'mutt')
+        pit = child.create_dog(breed: 'pit')
 
         # another mutt, not the same childs
-        Dog.create(breed: 'mutt')
+        another_mutt = Family::Dog.create(breed: 'mutt')
 
-        expect(Dog.where(breed: 'mutt').count).to eq(2)
-        expect(child.dogs.where(breed: 'mutt').count).to eq(1)
+        expect(Family::Dog.where(breed: 'mutt').all).to eq([mutt, another_mutt])
+        expect(child.dogs.where(breed: 'mutt').all).to eq([mutt])
+        expect(child.dogs.where.not(breed: 'mutt').all).to eq([pit])
 
         expect(
           child.dogs.
             where(breed: 'mutt')
         ).to eq(
-          Dog.
+          Family::Dog.
             where(child_id: child.id).
             where(breed: 'mutt')
         )
@@ -350,21 +351,21 @@ describe "passive record models" do
 
       it 'should do the nested query example from the readme' do
         child.create_dog
-        expect(Dog.find_all_by(child: {parent: parent})).
+        expect(Family::Dog.find_all_by(child: {parent: parent})).
           to eq(parent.dogs.all)
       end
 
       it 'should work for has-one intermediary relationships' do
         child.create_toy
-        expect(parent.toys).to all(be_a(Toy))
+        expect(parent.toys).to all(be_a(Family::Toy))
         expect(parent.toys.count).to eq(1)
         expect(parent.toys.first).to eq(child.toy)
       end
 
       it 'should attempt to construct intermediary relations' do
-        expect { parent.create_toy(child: child) }.to change {Toy.count}.by(1)
-        expect(Toy.last.child).to eq(child)
-        expect(Toy.last.child.parent).to eq(parent)
+        expect { parent.create_toy(child: child) }.to change {Family::Toy.count}.by(1)
+        expect(Family::Toy.last.child).to eq(child)
+        expect(Family::Toy.last.child.parent).to eq(parent)
       end
 
       it 'should accept class name' do

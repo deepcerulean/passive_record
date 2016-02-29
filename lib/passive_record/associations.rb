@@ -141,6 +141,7 @@ module PassiveRecord
 
       define_method(:"create_#{collection_name_sym.to_s.singularize}") do |attrs={}|
         relation = instance_eval{relata}.detect { |rel| rel.association == association }
+        # binding.pry
         relation.create(attrs)
       end
     end
