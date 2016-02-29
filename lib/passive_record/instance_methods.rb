@@ -17,7 +17,15 @@ module PassiveRecord
     end
 
     def destroy
+      self.class.before_destroy_hooks.each do |hook|
+        hook.run(self)
+      end
+
       self.class.destroy(self.id)
+
+      self.class.after_destroy_hooks.each do |hook|
+        hook.run(self)
+      end
     end
 
     # from http://stackoverflow.com/a/8417341/90042

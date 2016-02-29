@@ -22,50 +22,73 @@ module PassiveRecord
       end
     end
 
-    def before_create_hooks
+    def inject_hook(hook)
       @hooks ||= []
-      @hooks.select { |hook| hook.kind == :before_create }
+      @hooks += [ hook ]
+    end
+
+    def find_hooks_of_type(type)
+      @hooks ||= []
+      @hooks.select { |hook| hook.kind == type }
+    end
+
+    def before_create_hooks
+      find_hooks_of_type :before_create
     end
 
     def before_create(*meth_syms, &blk)
       hook = Hook.new(:before_create,*meth_syms,&blk)
-      @hooks ||= []
-      @hooks += [ hook ]
+      inject_hook hook
+      self
     end
 
     def after_create_hooks
-      @hooks ||= []
-      @hooks.select { |hook| hook.kind == :after_create }
+      find_hooks_of_type :after_create
     end
 
     def after_create(*meth_syms, &blk)
       hook = Hook.new(:after_create,*meth_syms,&blk)
-      @hooks ||= []
-      @hooks += [ hook ]
+      inject_hook hook
       self
     end
 
     def before_update_hooks
-      @hooks ||= []
-      @hooks.select { |hook| hook.kind == :before_update }
+      find_hooks_of_type :before_update
     end
 
     def before_update(*meth_syms, &blk)
       hook = Hook.new(:before_update,*meth_syms,&blk)
-      @hooks ||= []
-      @hooks += [ hook ]
+      inject_hook hook
       self
     end
 
     def after_update_hooks
-      @hooks ||= []
-      @hooks.select { |hook| hook.kind == :after_update }
+      find_hooks_of_type :after_update
     end
 
     def after_update(*meth_syms, &blk)
       hook = Hook.new(:after_update,*meth_syms,&blk)
-      @hooks ||= []
-      @hooks += [ hook ]
+      inject_hook hook
+      self
+    end
+
+    def before_destroy_hooks
+      find_hooks_of_type :before_destroy
+    end
+
+    def before_destroy(*meth_syms,&blk)
+      hook = Hook.new(:before_destroy,*meth_syms,&blk)
+      inject_hook(hook)
+      self
+    end
+
+    def after_destroy_hooks
+      find_hooks_of_type :after_destroy
+    end
+
+    def after_destroy(*meth_syms,&blk)
+      hook = Hook.new(:after_destroy,*meth_syms,&blk)
+      inject_hook(hook)
       self
     end
   end
