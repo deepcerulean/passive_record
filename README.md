@@ -1,6 +1,5 @@
 # passive_record
 
-[![Join the chat at https://gitter.im/deepcerulean/passive_record](https://badges.gitter.im/deepcerulean/passive_record.svg)](https://gitter.im/deepcerulean/passive_record?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 * [Documentation](https://rubygems.org/gems/passive_record)
 * [Email](mailto:joe at deepc.io)
@@ -9,6 +8,7 @@
 [![Codeship Status for deepcerulean/passive_record](https://www.codeship.io/projects/66bb2d90-ba61-0133-af95-025ac38368ea/status)](https://codeship.com/projects/128700)
 [![Test Coverage](https://codeclimate.com/github/deepcerulean/passive_record/badges/coverage.svg)](https://codeclimate.com/github/deepcerulean/passive_record/coverage)
 [![Gem Version](https://badge.fury.io/rb/passive_record.svg)](https://badge.fury.io/rb/passive_record)
+[![Join the chat at https://gitter.im/deepcerulean/passive_record](https://badges.gitter.im/deepcerulean/passive_record.svg)](https://gitter.im/deepcerulean/passive_record?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Description
 
