@@ -96,6 +96,7 @@ PassiveRecord may be right for you!
 
   A class `Role` which is declared to `include PassiveRecord` will gain the following instance methods:
   - `role.update(attrs_hash)`
+  - `role.destroy`
   - `role.to_h`
   - We override `role.inspect` to show ID and visible attributes
 
