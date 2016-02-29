@@ -1,5 +1,7 @@
 # passive_record
 
+[![Join the chat at https://gitter.im/deepcerulean/passive_record](https://badges.gitter.im/deepcerulean/passive_record.svg)](https://gitter.im/deepcerulean/passive_record?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 * [Documentation](https://rubygems.org/gems/passive_record)
 * [Email](mailto:joe at deepc.io)
 
