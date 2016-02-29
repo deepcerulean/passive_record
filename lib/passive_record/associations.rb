@@ -87,7 +87,7 @@ module PassiveRecord
         through_class_collection_name = opts.delete(:through)
 
         through_class_name = (through_class_collection_name.to_s).split('_').map(&:capitalize).join
-        base_association = associations.detect { |assn| assn.child_class_name == through_class_name }
+        base_association = associations.detect { |assn| assn.child_class_name == through_class_name rescue false }
 
         association = HasManyThroughAssociation.new(
           self, target_class_name, collection_name_sym, through_class_collection_name, base_association)
@@ -156,13 +156,17 @@ module PassiveRecord
         self.name.split('::').last.singularize +
         "JoinModel"
 
-      if (Object.const_get(inverse_habtm_join_class_name) rescue false)
+      module_name = self.name.deconstantize
+      module_name = "Object" if module_name.empty?
+      intended_module = module_name.constantize
+      
+      if (intended_module.const_get(inverse_habtm_join_class_name) rescue false)
         has_many inverse_habtm_join_class_name.underscore.pluralize.to_sym
         has_many collection_name_sym, :through => inverse_habtm_join_class_name.underscore.pluralize.to_sym
       else
         auto_collection_sym = self.name.split('::').last.underscore.pluralize.to_sym
         eval <<-ruby
-        class ::#{habtm_join_class_name}                        # class UserRoleJoinModel
+        class #{module_name}::#{habtm_join_class_name}          # class System::UserRoleJoinModel
           include PassiveRecord                                 #   include PassiveRecord
           belongs_to :#{collection_name_sym.to_s.singularize}   #   belongs_to :role
           belongs_to :#{auto_collection_sym.to_s.singularize}   #   belongs_to :user

@@ -65,7 +65,7 @@ describe "passive record models" do
             to eq("Family::Dog (id: #{dog.id.inspect}, breed: \"#{dog.breed}\", created_at: #{dog.created_at}, sound: \"bark\", child_id: #{child.id.inspect})")
 
           expect(child.inspect).
-            to eq("Family::Child (id: #{child.id.inspect}, created_at: #{child.created_at}, name: \"Alice\", toy_id: nil, dog_ids: [#{dog.id.inspect}], parent_id: nil)")
+            to eq("Family::Child (id: #{child.id.inspect}, created_at: #{child.created_at}, name: \"Alice\", toy_id: nil, dog_ids: [#{dog.id.inspect}], parent_id: nil, secret_club_ids: [])")
         end
       end
 
@@ -372,6 +372,7 @@ describe "passive record models" do
         post = Post.create
         user = User.create
         Comment.create(post: post, user: user)
+
         expect(post.commenters.all).to eq([user])
       end
     end
@@ -423,14 +424,15 @@ describe "passive record models" do
       it 'should handle inverse relations' do
         expect {role.users << another_user}.to change{another_user.roles.count}.by(1)
       end
-    end
-  end
-end
 
-describe "configuration" do
-  context 'with default config' do
-    it 'should generate simple identifiers' do
-      expect(Model.create.id).to be_a(PassiveRecord::SecureRandomIdentifier)
+      it 'should work inside modules' do
+        child = Family::Child.create
+        secret_club = child.create_secret_club
+
+        expect(secret_club).to be_a(Family::SecretClub)
+        expect(secret_club.children.all).to eq([child])
+        expect(child.secret_clubs.first.create_child).to be_a(Family::Child)
+      end
     end
   end
 end

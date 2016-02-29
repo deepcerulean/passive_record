@@ -44,6 +44,10 @@ module PassiveRecord
       def id
         parent_model.id
       end
+
+      def child_class_name
+        child_class.name
+      end
     end
   end
 end

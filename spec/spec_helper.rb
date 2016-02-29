@@ -36,11 +36,16 @@ module Family
     has_one :toy
     has_many :dogs
     belongs_to :parent
+    has_and_belongs_to_many :secret_clubs
 
     attr_reader :name
     after_create :give_name
 
     def give_name; @name = "Alice" end
+  end
+
+  class SecretClub < Model
+    has_and_belongs_to_many :children
   end
 
   class Parent < Model
@@ -90,18 +95,18 @@ end
 ###
 
 class Post < Model
-  has_many :comments 
+  has_many :comments
   has_many :commenters, :through => :comments, :class_name => "User"
 
   attr_accessor :published_at
   before_create { @published_at = Time.now }
 
   def self.recent
-    where(:published_at => 3.days.ago..Time.now) 
+    where(:published_at => 3.days.ago..Time.now)
   end
 
   def self.published_within_days(n)
-    where(:published_at => n.days.ago..Time.now) 
+    where(:published_at => n.days.ago..Time.now)
   end
 end
 

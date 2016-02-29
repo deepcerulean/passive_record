@@ -9,14 +9,40 @@ module PassiveRecord
     class HasManyThroughRelation < HasManyRelation
       def <<(child)
         intermediary_relation.
-          where((target_sym.to_s.singularize + "_id").to_sym => child.id).
+          where(
+            association.target_name_symbol.to_s.singularize + "_id" => child.id).
           first_or_create
-        all
+        self
+      end
+
+      def create(attrs={})
+        child = child_class.create(attrs)
+        send(:<<, child)
+        child
+      end
+
+      def nested_class
+        module_name = association.parent_class.name.deconstantize
+        module_name = "Object" if module_name.empty?
+        (module_name.constantize).
+          const_get("#{association.base_association.child_class_name.singularize}")
+      end
+
+      def nested_association
+        nested_class.associations.detect { |assn|
+          assn.child_class_name == association.child_class_name ||
+          assn.child_class_name == association.child_class_name.singularize ||
+
+          (assn.parent_class_name == association.child_class_name rescue false) ||
+          (assn.parent_class_name == association.child_class_name.singularize rescue false) ||
+
+          assn.target_name_symbol == association.target_name_symbol.to_s.singularize.to_sym
+        }
       end
 
       def all
-        if target_sym && results
-          final_results = results.flat_map(&target_sym)
+        if intermediate_results && !intermediate_results.empty?
+          final_results = intermediate_results.flat_map(&nested_association.target_name_symbol)
           if final_results.first.is_a?(Associations::Relation) && !final_results.first.singular?
             final_results.first.send(:all)
           else
@@ -27,38 +53,12 @@ module PassiveRecord
         end
       end
 
-
       def intermediary_relation
         association.base_association.to_relation(parent_model)
       end
 
-      def results
+      def intermediate_results
         intermediary_relation.all
-      end
-
-      def target_sym
-        name_str = association.target_name_symbol.to_s
-        singular_target_sym = name_str.singularize.to_sym
-        plural_target_sym   = name_str.pluralize.to_sym
-
-        singular_class_name_sym = association.child_class_name.underscore.singularize.to_sym
-        plural_class_name_sym = association.child_class_name.underscore.pluralize.to_sym
-
-        if !results.empty?
-          if results.first.respond_to?(singular_target_sym)
-            singular_target_sym
-          elsif results.first.respond_to?(plural_target_sym)
-            plural_target_sym
-          elsif results.first.respond_to?(singular_class_name_sym)
-            singular_class_name_sym
-          elsif results.first.respond_to?(plural_class_name_sym)
-            plural_class_name_sym
-          end
-        end
-      end
-
-      def create(attrs={})
-        child_class.create(attrs)
       end
     end
   end

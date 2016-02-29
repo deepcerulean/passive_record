@@ -44,7 +44,7 @@ module PassiveRecord
       attr_names = instance_variables
       attr_names += self.class.associations_id_syms
       attr_names += members rescue []
-      attr_names.reject! { |name| name.to_s.start_with?("@_") }
+      attr_names.reject! { |name| name.to_s.start_with?("@_") || name.match(/join_model/) }
       attr_names - blacklisted_attribute_names
     end
 
