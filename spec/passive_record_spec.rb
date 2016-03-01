@@ -374,11 +374,13 @@ describe "passive record models" do
       end
 
       it 'should construct intermediary relations with many-through-many' do
-        #expect{parent.create_dog}.to change{Family::Dog.count}.by(1)
-        # expect{parent.create_dog(child: child)}.to change{child.dogs.count}.by(1)
-        # expect{parent.create_dog(child_id: child.id)}.to change{child.dogs.count}.by(1)
-        expect{parent.toys << Family::Toy.create}.to change{parent.toys.count}.by(1)
         expect{parent.dogs << Family::Dog.create}.to change{parent.dogs.count}.by(1)
+
+        expect{parent.create_dog}.to change{parent.dogs.count}.by(1)
+
+        expect{parent.toys << Family::Toy.create}.to change{parent.toys.count}.by(1)
+        expect{parent.create_dog(child: child)}.to change{child.dogs.count}.by(1)
+        expect{parent.create_dog(child_id: child.id)}.to change{child.dogs.count}.by(1)
       end
 
       it 'should accept class name' do

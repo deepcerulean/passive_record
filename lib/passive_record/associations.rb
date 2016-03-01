@@ -109,27 +109,24 @@ module PassiveRecord
           end
 
           # add in new ones...
-          target_name = relation.association.target_name_symbol.to_s
-          new_collection_ids.each do |child_id|
-            #  binding.pry
-            if !(relation.nested_association.is_a?(BelongsToAssociation))# && 
-              # intermediary.is_a?(HasManyRelation)
+          singular_target = collection_name_sym.to_s.singularize
+          if !(relation.nested_association.is_a?(BelongsToAssociation))# && 
+            intermediary.create(
+              singular_target + "_ids" => new_collection_ids,
+              relation.parent_model_id_field => relation.id 
+            )
+          else
+            new_collection_ids.each do |child_id|
               intermediary.create(
-                target_name.singularize + "_ids" => [child_id], 
+                singular_target + "_id" => child_id, 
                 relation.parent_model_id_field => relation.id 
               )
-
-              #binding.pry
-              #intermediary.create( # #target_name.singularize + "_ids" => [child_id]) #, relation.parent_model_id_field => relation.id)
-            elsif # intermediary.is_a?(HasOneRelation)
-              intermediary.create(target_name.singularize + "_id" => child_id, relation.parent_model_id_field => relation.id )
             end
           end
         end
       else
         association = HasManyAssociation.new(self, target_class_name, collection_name_sym)
         associate!(association)
-
 
         define_method(:"#{collection_name_sym}=") do |new_collection|
           relation = instance_eval{relata}.detect { |rel| rel.association == association }
@@ -162,7 +159,7 @@ module PassiveRecord
 
       define_method(:"create_#{collection_name_sym.to_s.singularize}") do |attrs={}|
         relation = instance_eval{relata}.detect { |rel| rel.association == association }
-        relation.create(attrs)
+      relation.create(attrs)
       end
     end
 
@@ -179,7 +176,7 @@ module PassiveRecord
       module_name = self.name.deconstantize
       module_name = "Object" if module_name.empty?
       intended_module = module_name.constantize
-      
+
       if (intended_module.const_get(inverse_habtm_join_class_name) rescue false)
         has_many inverse_habtm_join_class_name.underscore.pluralize.to_sym
         has_many collection_name_sym, :through => inverse_habtm_join_class_name.underscore.pluralize.to_sym
