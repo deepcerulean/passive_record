@@ -111,7 +111,19 @@ module PassiveRecord
           # add in new ones...
           target_name = relation.association.target_name_symbol.to_s
           new_collection_ids.each do |child_id|
-            intermediary.create(target_name.singularize + "_id" => child_id, relation.parent_model_id_field => relation.id )
+            #  binding.pry
+            if !(relation.nested_association.is_a?(BelongsToAssociation))# && 
+              # intermediary.is_a?(HasManyRelation)
+              intermediary.create(
+                target_name.singularize + "_ids" => [child_id], 
+                relation.parent_model_id_field => relation.id 
+              )
+
+              #binding.pry
+              #intermediary.create( # #target_name.singularize + "_ids" => [child_id]) #, relation.parent_model_id_field => relation.id)
+            elsif # intermediary.is_a?(HasOneRelation)
+              intermediary.create(target_name.singularize + "_id" => child_id, relation.parent_model_id_field => relation.id )
+            end
           end
         end
       else
@@ -145,7 +157,7 @@ module PassiveRecord
       end
 
       define_method(:"#{collection_name_sym.to_s.singularize}_ids") do
-        send(collection_name_sym).map(&:id)
+        send(collection_name_sym).map(&:id) rescue binding.pry
       end
 
       define_method(:"create_#{collection_name_sym.to_s.singularize}") do |attrs={}|

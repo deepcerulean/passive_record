@@ -9,7 +9,14 @@ module PassiveRecord
     class HasManyThroughRelation < HasManyRelation
       def <<(child)
         if nested_association.is_a?(HasManyAssociation)
-          intermediary_relation.create(association.target_name_symbol.to_s.singularize + "_ids" => [child.id])
+          # parent_model.send
+          # it seems like we're probably already handled? OR NOT
+          # binding.pry
+          nested_ids_field = nested_association.children_name_sym.to_s.singularize + "_ids"
+          parent_model.send(
+            :"#{nested_ids_field}=", 
+            parent_model.send(nested_ids_field) + [child.id]
+          )
         else
           intermediary_relation.
             where(

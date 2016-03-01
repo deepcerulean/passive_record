@@ -70,6 +70,9 @@ module PassiveRecord
       end
 
       instance
+    rescue => ex
+      binding.pry
+      raise ex
     end
 
     def destroy(id)
