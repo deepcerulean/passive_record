@@ -154,7 +154,7 @@ module PassiveRecord
       end
 
       define_method(:"#{collection_name_sym.to_s.singularize}_ids") do
-        send(collection_name_sym).map(&:id) rescue binding.pry
+        send(collection_name_sym).map(&:id)
       end
 
       define_method(:"create_#{collection_name_sym.to_s.singularize}") do |attrs={}|
