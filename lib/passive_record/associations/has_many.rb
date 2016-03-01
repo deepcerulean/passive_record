@@ -19,6 +19,10 @@ module PassiveRecord
       end
       def_delegators :all, :each
 
+      def last
+        all.last
+      end
+
       def all?(*args)
         all.all?(*args)
       end

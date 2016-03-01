@@ -366,6 +366,15 @@ describe "passive record models" do
         expect { parent.create_toy(child: child) }.to change {Family::Toy.count}.by(1)
         expect(Family::Toy.last.child).to eq(child)
         expect(Family::Toy.last.child.parent).to eq(parent)
+
+        expect { 3.times { parent.toys << Family::Toy.create } }.to change {parent.toys.count}.by(3)
+        expect(parent.toys.last.child).not_to be_nil
+
+        expect{parent.create_toy}.to change{Family::Toy.count}.by(1)
+      end
+
+      it 'should construct intermediary relations with many-through-many' do
+        expect{parent.create_dog}.to change{Family::Dog.count}.by(1)
       end
 
       it 'should accept class name' do
@@ -388,6 +397,10 @@ describe "passive record models" do
 
         expect(patient.doctors.all).to eq([doctor])
         expect(doctor.patients.all).to eq([patient])
+      end
+
+      it 'should handle insertion' do
+        expect{patient.doctors << Doctor.create}.to change{patient.doctors.count}.by(1)
       end
     end
 

@@ -8,10 +8,15 @@ module PassiveRecord
 
     class HasManyThroughRelation < HasManyRelation
       def <<(child)
-        intermediary_relation.
-          where(
-            association.target_name_symbol.to_s.singularize + "_id" => child.id).
-          first_or_create
+        if nested_association.is_a?(HasManyAssociation)
+          intermediary_relation.create(association.target_name_symbol.to_s.singularize + "_ids" => [child.id])
+        else
+          intermediary_relation.
+            where(
+              association.target_name_symbol.to_s.singularize + "_id" => child.id).
+              first_or_create
+
+        end
         self
       end
 

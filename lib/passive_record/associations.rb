@@ -71,7 +71,7 @@ module PassiveRecord
       define_method(:"#{child_name_sym}_id=") do |new_child_id|
         relation = instance_eval{relata}.detect { |rel| rel.association == association }
         # detach existing child...
-        relation.lookup.send(:"#{relation.parent_model_id_field}=", nil)
+        relation.lookup&.send(:"#{relation.parent_model_id_field}=", nil)
 
         relation.child_class.
           find(new_child_id).
@@ -95,6 +95,10 @@ module PassiveRecord
         associate!(association)
 
         define_method(:"#{collection_name_sym}=") do |new_collection|
+          send(:"#{collection_name_sym.to_s.singularize}_ids=", new_collection.map(&:id))
+        end
+
+        define_method(:"#{collection_name_sym.to_s.singularize}_ids=") do |new_collection_ids|
           relation = instance_eval{relata}.detect { |rel| rel.association == association }
 
           intermediary = relation.intermediary_relation
@@ -106,8 +110,8 @@ module PassiveRecord
 
           # add in new ones...
           target_name = relation.association.target_name_symbol.to_s
-          new_collection.each do |child|
-            intermediary.create(target_name.singularize + "_id" => child.id, relation.parent_model_id_field => relation.id )
+          new_collection_ids.each do |child_id|
+            intermediary.create(target_name.singularize + "_id" => child_id, relation.parent_model_id_field => relation.id )
           end
         end
       else
@@ -128,6 +132,11 @@ module PassiveRecord
             child.send(:"#{relation.parent_model_id_field}=", relation.id)
           end
         end
+
+        define_method(:"#{collection_name_sym.to_s.singularize}_ids=") do |new_collection_ids|
+          relation = instance_eval{relata}.detect { |rel| rel.association == association }
+          send(:"#{collection_name_sym}=", relation.child_class.find(new_collection_ids))
+        end
       end
 
       define_method(collection_name_sym) do
@@ -141,7 +150,6 @@ module PassiveRecord
 
       define_method(:"create_#{collection_name_sym.to_s.singularize}") do |attrs={}|
         relation = instance_eval{relata}.detect { |rel| rel.association == association }
-        # binding.pry
         relation.create(attrs)
       end
     end
