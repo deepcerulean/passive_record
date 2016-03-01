@@ -176,7 +176,10 @@ PassiveRecord may be right for you!
 
   - `before_create :call_a_method`
   - `after_create :call_another_method, :and_then_call_another_one`
+  - `before_update do manually_invoke(a_method) end`
   - `after_update { or_use_a_block }`
+  - `before_destroy :something`
+  - `after_destroy { something_else }`
 
 ## Copyright
 
