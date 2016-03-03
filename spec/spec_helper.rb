@@ -26,14 +26,21 @@ module Family
     after_create { @sound = 'bark' }
   end
 
+  class ToyQuality < Model
+    attr_accessor :name
+    belongs_to :toy
+  end
+
   class Toy < Model
     belongs_to :child
+    has_many :toy_qualities
     attr_reader :kind
     after_create {@kind = %w[ stuffed_animal blocks cards ].sample}
   end
 
   class Child < Model
     has_one :toy
+    has_many :toy_qualities, :through => :toy
     has_many :dogs
     belongs_to :parent
     has_and_belongs_to_many :secret_clubs

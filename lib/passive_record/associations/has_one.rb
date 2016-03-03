@@ -29,6 +29,10 @@ module PassiveRecord
         )
       end
 
+      def lookup_or_create
+        lookup || create
+      end
+
       def parent_model_id_field
         association.parent_class.name.demodulize.underscore + "_id"
       end

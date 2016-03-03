@@ -17,17 +17,19 @@ module PassiveRecord
               send(:"#{parent_model_id_field}=", parent_model.id)
           else
             nested_ids_field = nested_association.children_name_sym.to_s.singularize + "_ids"
-            intermediary_relation.create(
-              parent_model_id_field => parent_model.id,
-              nested_ids_field => [ child.id ]
-            )
+            intermediary_model = intermediary_relation.singular? ?
+                intermediary_relation.lookup_or_create :
+                intermediary_relation.where(parent_model_id_field => parent_model.id).first_or_create
+
+            intermediary_model.update(
+                nested_ids_field => intermediary_model.send(nested_ids_field) + [ child.id ]
+              )
           end
         else
-          intermediary_relation.
+          intermediary_model = intermediary_relation.
             where(
               association.target_name_symbol.to_s.singularize + "_id" => child.id).
               first_or_create
-
         end
         self
       end
@@ -58,9 +60,10 @@ module PassiveRecord
       end
 
       def all
-        if intermediate_results && !intermediate_results.empty?
-          final_results = intermediate_results.flat_map(&nested_association.target_name_symbol)
-          if final_results.first.is_a?(Associations::Relation) && !final_results.first.singular?
+        join_results = intermediate_results
+        if intermediate_results && !join_results.empty?
+          final_results = join_results.flat_map(&nested_association.target_name_symbol)
+          if final_results.first.is_a?(Associations::Relation)
             final_results.flat_map(&:all)
           else
             Array(final_results)
@@ -71,11 +74,15 @@ module PassiveRecord
       end
 
       def intermediary_relation
-        association.base_association.to_relation(parent_model)
+        @intermediary_relation ||= association.base_association.to_relation(parent_model)
       end
 
       def intermediate_results
-        intermediary_relation.all
+        if intermediary_relation.singular?
+          Array(intermediary_relation.lookup)
+        else
+          intermediary_relation.all
+        end
       end
     end
   end

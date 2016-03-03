@@ -65,7 +65,7 @@ describe "passive record models" do
             to eq("Family::Dog (id: #{dog.id.inspect}, breed: \"#{dog.breed}\", created_at: #{dog.created_at}, sound: \"bark\", child_id: #{child.id.inspect})")
 
           expect(child.inspect).
-            to eq("Family::Child (id: #{child.id.inspect}, created_at: #{child.created_at}, name: \"Alice\", toy_id: nil, dog_ids: [#{dog.id.inspect}], parent_id: nil, secret_club_ids: [])")
+            to eq("Family::Child (id: #{child.id.inspect}, created_at: #{child.created_at}, name: \"Alice\", toy_id: nil, toy_quality_ids: [], dog_ids: [#{dog.id.inspect}], parent_id: nil, secret_club_ids: [])")
         end
       end
 
@@ -366,7 +366,7 @@ describe "passive record models" do
         expect { parent.create_toy(child: child) }.to change {Family::Toy.count}.by(1)
         expect(Family::Toy.last.child).to eq(child)
         expect(Family::Toy.last.child.parent).to eq(parent)
-
+        expect { 3.times { parent.toys << Family::Toy.create } }.to change {Family::Toy.count}.by(3)
         expect { 3.times { parent.toys << Family::Toy.create } }.to change {parent.toys.count}.by(3)
         expect(parent.toys.last.child).not_to be_nil
 
@@ -451,6 +451,19 @@ describe "passive record models" do
         expect(secret_club).to be_a(Family::SecretClub)
         expect(secret_club.children.all).to eq([child])
         expect(child.secret_clubs.first.create_child).to be_a(Family::Child)
+      end
+    end
+
+    context 'has many through has one' do
+      it 'should manage relationships' do
+        child = Family::Child.create
+        toy_quality = child.create_toy_quality(name: 'fun')
+        child.create_toy_quality(name: 'cool')
+        child.create_toy_quality(name: 'radical')
+
+        expect(child.toy_qualities.all).to include(toy_quality)
+        expect(child.toy_qualities.count).to eq(3)
+        expect(child.toy_qualities.map(&:name)).to eq(%w[ fun cool radical ])
       end
     end
   end
