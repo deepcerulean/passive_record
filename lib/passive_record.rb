@@ -38,6 +38,6 @@ module PassiveRecord
   end
 
   def self.drop_all
-    (model_classes + model_classes.flat_map(&:descendants)).each(&:destroy_all)
+    (model_classes + model_classes.flat_map(&:descendants)).uniq.each(&:destroy_all)
   end
 end

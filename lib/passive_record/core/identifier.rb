@@ -9,7 +9,8 @@ module PassiveRecord
     end
 
     def ==(other_id)
-      self.value == other_id.value rescue self.value == other_id
+      self.value == other_id || 
+        (other_id.is_a?(SecureRandomIdentifier) && self.value == other_id&.value)
     end
 
     def inspect
