@@ -148,6 +148,10 @@ PassiveRecord may be right for you!
   - `parent.children.all?(&predicate)`
   - `parent.children.empty?`
   - `parent.children.where(conditions)` (returns a `Core::Query`)
+  - `parent.children.pluck(attribute)`
+  - `parent.children.sum(attribute)`
+  - `parent.children.average(attribute)`
+  - `parent.children.mode(attribute)`
 
 ### Relations
 
