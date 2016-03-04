@@ -162,15 +162,17 @@ PassiveRecord may be right for you!
 
 ### Queries
 
-  `Core::Query` objects acquired through `where` are chainable, accept nested queries and scopes, and have the following public methods:
+  You can acquire `Core::Query` objects from a model `Post` which includes PassiveRecord through `where`. These are chainable, accept nested conditions, and understand scopes defined as class methods. The query object will have the following public methods:
 
-  - `where(conditions).all`
-  - `where(conditions).each` enumerates over `where(conditions).all`, so we have `where(conditions).count`, `where(conditions).first`, etc.
-  - `where(conditions).create(attrs)`
-  - `where(conditions).first_or_create(attrs)`
-  - `where(conditions).where(further_conditions)` (chaining)
-  - `where.not(conditions)` (negation)
-  - `where.scope` (scoping with model class methods that return a query)
+  - `Post.where(conditions).all`
+  - `Post.where(conditions).each` enumerates over `where(conditions).all`, so we have `where(conditions).count`, `where(conditions).first`, etc.
+  - `Post.where(conditions).create(attrs)`
+  - `Post.where(conditions).first_or_create(attrs)`
+  - `Post.where(conditions).where(further_conditions)` (chaining)
+  - `Post.where.not(conditions)` (negation)
+  - `Post.where(conditions).or(Post.where(conditions))` (disjunction)
+  - `Post.where.active` (scoping with model class methods that return a query, also supports chaining)
+ 
 
 ## Hooks
 
