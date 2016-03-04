@@ -162,7 +162,7 @@ PassiveRecord may be right for you!
 
 ### Queries
 
-  You can acquire `Core::Query` objects through the class method `where`. These are chainable, accept nested conditions, and understand scopes defined as class methods. The query object will have the following public methods:
+  You can acquire `Core::Query` objects through the class method `where`. These are chainable, accept nested conditions that traverse relationships, and understand scopes defined as class methods. The query object will have the following public methods:
 
   - `Post.where(conditions).all`
   - `Post.where(conditions).each` enumerates over `where(conditions).all`, so we have `where(conditions).count`, `where(conditions).first`, etc.
@@ -172,6 +172,12 @@ PassiveRecord may be right for you!
   - `Post.where.not(conditions)` (negation)
   - `Post.where(conditions).or(Post.where(conditions))` (disjunction)
   - `Post.active.recent` (scoping with class methods that return queries; supports chaining)
+
+  `conditions` here is expected to be a hash of attribute values. Note that there is special behavior for certain kinds of values.
+
+  - Ranges select models with an attribute covered by the range (behaving like `BETWEEN`)
+  - Arrays select models with an attribute whose value is in the array (behaving like `IN`)
+  - Hash values (subhashes) select models with related models who attributes match the inner hash. So `Doctor.where(appointments: { patient: patient })` finds doctors whose appointments include an appointment with `patient`.
  
 
 ## Hooks
