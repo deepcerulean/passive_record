@@ -340,6 +340,16 @@ describe "passive record models" do
         expect(parent.children.all).to eq([child, another_child])
         expect(parent.child_ids).to eq([child.id, another_child.id])
       end
+
+      it 'should provide arithmetic helpers' do
+        parent.create_child(age: 10)
+        parent.create_child(age: 10)
+        parent.create_child(age: 40)
+        expect(parent.children.pluck(:age)).to eq([10,10,40])
+        expect(parent.children.sum(:age)).to eq(60)
+        expect(parent.children.average(:age)).to eq(20)
+        expect(parent.children.mode(:age)).to eq(10)
+      end
     end
 
     context 'one-to-many through relationships' do

@@ -47,6 +47,7 @@ module Family
 
     attr_reader :name
     after_create :give_name
+    attr_accessor :age
 
     def give_name; @name = "Alice" end
   end
