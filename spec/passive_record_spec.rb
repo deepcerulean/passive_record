@@ -345,10 +345,14 @@ describe "passive record models" do
         parent.create_child(age: 10)
         parent.create_child(age: 10)
         parent.create_child(age: 40)
+
         expect(parent.children.pluck(:age)).to eq([10,10,40])
         expect(parent.children.sum(:age)).to eq(60)
         expect(parent.children.average(:age)).to eq(20)
         expect(parent.children.mode(:age)).to eq(10)
+
+        expect(parent.children.where(:age => 10).pluck(:age)).to eq([10,10])
+        expect(parent.children.where(:age => 10).sum(:age)).to eq(20)
       end
     end
 

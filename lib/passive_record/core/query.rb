@@ -3,6 +3,7 @@ module PassiveRecord
     class Query
       include Enumerable
       extend Forwardable
+      include PassiveRecord::ArithmeticHelpers
 
       def initialize(klass,conditions={},scope=nil)
         @klass = klass
