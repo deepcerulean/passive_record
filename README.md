@@ -172,6 +172,10 @@ PassiveRecord may be right for you!
   - `Post.where(conditions).each` enumerates over `where(conditions).all`, so we have `where(conditions).count`, `where(conditions).first`, etc.
   - `Post.where(conditions).create(attrs)`
   - `Post.where(conditions).first_or_create(attrs)`
+  - `Post.where(conditions).pluck(attr)`
+  - `Post.where(conditions).sum(attr)`
+  - `Post.where(conditions).average(attr)`
+  - `Post.where(conditions).mode(attr)`
   - `Post.where(conditions).where(further_conditions)` (chaining)
   - `Post.where.not(conditions)` (negation)
   - `Post.where(conditions).or(Post.where(conditions))` (disjunction)
