@@ -205,9 +205,35 @@ describe "passive record models" do
           end
         end
 
+        context 'queries with disjunctions' do
+          it 'should find where attributes match EITHER query' do
+            pom = Family::Dog.create breed: 'pom'
+            pug = Family::Dog.create breed: 'pug'
+            Family::Dog.create breed: 'mutt'
+            Family::Dog.create breed: 'lab'
+            Family::Dog.create breed: 'papillon'
+
+            expect(
+              Family::Dog.
+                where(breed: 'pom').or(Family::Dog.where(breed: 'pug')).all
+            ).to eq([pom, pug])
+          end
+        end
+
+        context 'query chaining' do
+          it 'should handle conjoining scopes together' do
+            Post.create published_at: 10.days.ago, active: true
+            Post.create active: false
+            recent_and_active = Post.create active: true
+
+            expect(Post.active.recent.all).to eq([recent_and_active])
+            expect(Post.recent.active.all).to eq([recent_and_active])
+          end
+        end
+
         context 'queries with scopes' do
-          let(:post) { Post.create(published_at: 10.days.ago) }
-          let(:another_post) {Post.create(published_at: 2.days.ago)}
+          let!(:post) { Post.create(published_at: 10.days.ago) }
+          let!(:another_post) {Post.create(published_at: 2.days.ago)}
 
           describe 'should restrict using class method' do
             it 'should use a class method as a scope' do
@@ -341,11 +367,11 @@ describe "passive record models" do
 
         expect(
           child.dogs.
-            where(breed: 'mutt')
+            where(breed: 'mutt').all
         ).to eq(
           Family::Dog.
             where(child_id: child.id).
-            where(breed: 'mutt')
+            where(breed: 'mutt').all
         )
       end
 

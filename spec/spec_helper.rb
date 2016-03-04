@@ -105,8 +105,12 @@ class Post < Model
   has_many :comments
   has_many :commenters, :through => :comments, :class_name => "User"
 
-  attr_accessor :published_at
+  attr_accessor :active, :published_at
   before_create { @published_at = Time.now }
+
+  def self.active
+    where(active: true)
+  end
 
   def self.recent
     where(:published_at => 3.days.ago..Time.now)
