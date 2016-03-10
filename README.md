@@ -204,7 +204,12 @@ PassiveRecord may be right for you!
     like the round-trip with a database, sending mail is externally "effectful" (and so, for instance, you may wish to take additional
     care around confirmation or retry logic, in order ensure you are not sending the same message more than once.)
   - These approaches are seen as somewhat hacky today, given that [ActiveModel](https://github.com/rails/rails/tree/master/activemodel) can 
-    give plain old Ruby objects a lot of the augmentations that ActiveRecord gives, such as validations, hooks and attribute management.
+    give plain old Ruby objects a lot of the augmentations that ActiveRecord gives, such as validations, hooks and attribute management. However 
+    I don't really see a way to do relations that interoperate with ActiveRecord the way you could, at least to some degree, with tableless models.
+  - It's not really clear to me yet if it's interesting for PassiveRecord to be able to interoperate smoothly with ActiveRecord relations. It
+    seems like we might be able to pull some similar tricks as the "tableless" approach in order to permit at least some relations to work between them.
+    But their intentions are so different I can't help but think there would be very strange bugs lurking in any such integration -- so the encouraged
+    architecture would be a complete separation between active and passive models.
 
 ## Copyright
 
