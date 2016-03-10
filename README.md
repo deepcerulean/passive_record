@@ -186,7 +186,6 @@ PassiveRecord may be right for you!
   - Ranges select models with an attribute covered by the range (behaving like `BETWEEN`)
   - Arrays select models with an attribute whose value is in the array (behaving like `IN`)
   - Hash values (subhashes) select models with related models who attributes match the inner hash. So `Doctor.where(appointments: { patient: patient })` finds doctors whose appointments include an appointment with `patient`.
- 
 
 ## Hooks
 
@@ -196,6 +195,16 @@ PassiveRecord may be right for you!
   - `after_update { or_use_a_block }`
   - `before_destroy :something`
   - `after_destroy { something_else }`
+
+# Prior Art
+
+  - Approaches exist that use ActiveRecord directly, and then override various methods in such a way to prevent AR from 
+    trying to persist the model. The canonical example here is the [tableless model](http://railscasts.com/episodes/193-tableless-model?view=asciicast)
+    approach, and the use case given there is a model that wraps around sending an email. This is maybe interesting because it's
+    like the round-trip with a database, sending mail is externally "effectful" (and so, for instance, you may wish to take additional
+    care around confirmation or retry logic, in order ensure you are not sending the same message more than once.)
+  - These approaches are seen as somewhat hacky today, given that [ActiveModel](https://github.com/rails/rails/tree/master/activemodel) can 
+    give plain old Ruby objects a lot of the augmentations that ActiveRecord gives, such as validations, hooks and attribute management.
 
 ## Copyright
 

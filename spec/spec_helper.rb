@@ -39,10 +39,10 @@ module Family
   end
 
   class Child < Model
+    belongs_to :parent
     has_one :toy
     has_many :toy_qualities, :through => :toy
     has_many :dogs
-    belongs_to :parent
     has_and_belongs_to_many :secret_clubs
 
     attr_reader :name
@@ -62,7 +62,6 @@ module Family
     has_many :toys, :through => :children
   end
 end
-#include Family
 
 ###
 

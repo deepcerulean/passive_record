@@ -31,7 +31,7 @@ module PassiveRecord
       end
 
       define_method(parent_name_sym) do
-        relation = instance_eval{relata}.detect { |rel| rel.association == association }
+        relation = relata.detect { |rel| rel.association == association }
         association.parent_class.find(relation.parent_model_id)
       end
 
@@ -40,7 +40,7 @@ module PassiveRecord
       end
 
       define_method(:"#{parent_name_sym}_id=") do |new_parent_id|
-        relation = instance_eval{relata}.detect { |rel| rel.association == association }
+        relation = relata.detect { |rel| rel.association == association }
         relation.parent_model_id = new_parent_id
       end
     end
@@ -55,12 +55,12 @@ module PassiveRecord
       end
 
       define_method(child_name_sym) do
-        relation = instance_eval{relata}.detect { |rel| rel.association == association }
+        relation = relata.detect { |rel| rel.association == association }
         relation.lookup
       end
 
       define_method(:"create_#{child_name_sym}") do |attrs={}|
-        relation = instance_eval{relata}.detect { |rel| rel.association == association }
+        relation = relata.detect { |rel| rel.association == association }
         relation.create(attrs)
       end
 
@@ -69,7 +69,7 @@ module PassiveRecord
       end
 
       define_method(:"#{child_name_sym}_id=") do |new_child_id|
-        relation = instance_eval{relata}.detect { |rel| rel.association == association }
+        relation = relata.detect { |rel| rel.association == association }
         # detach existing child...
         relation.lookup&.send(:"#{relation.parent_model_id_field}=", nil)
 
@@ -99,7 +99,7 @@ module PassiveRecord
         end
 
         define_method(:"#{collection_name_sym.to_s.singularize}_ids=") do |new_collection_ids|
-          relation = instance_eval{relata}.detect { |rel| rel.association == association }
+          relation = relata.detect { |rel| rel.association == association }
 
           intermediary = relation.intermediary_relation
 
@@ -129,7 +129,7 @@ module PassiveRecord
         associate!(association)
 
         define_method(:"#{collection_name_sym}=") do |new_collection|
-          relation = instance_eval{relata}.detect { |rel| rel.association == association }
+          relation = relata.detect { |rel| rel.association == association }
 
           # detach existing children...
           relation.all.each do |child|
@@ -143,14 +143,13 @@ module PassiveRecord
         end
 
         define_method(:"#{collection_name_sym.to_s.singularize}_ids=") do |new_collection_ids|
-          relation = instance_eval{relata}.detect { |rel| rel.association == association }
+          relation = relata.detect { |rel| rel.association == association }
           send(:"#{collection_name_sym}=", relation.child_class.find(new_collection_ids))
         end
       end
 
       define_method(collection_name_sym) do
-        relation = instance_eval{relata}.detect { |rel| rel.association == association }
-        relation
+        relata.detect { |rel| rel.association == association }
       end
 
       define_method(:"#{collection_name_sym.to_s.singularize}_ids") do
@@ -158,8 +157,8 @@ module PassiveRecord
       end
 
       define_method(:"create_#{collection_name_sym.to_s.singularize}") do |attrs={}|
-        relation = instance_eval{relata}.detect { |rel| rel.association == association }
-      relation.create(attrs)
+        relation = relata.detect { |rel| rel.association == association }
+        relation.create(attrs)
       end
     end
 

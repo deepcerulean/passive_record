@@ -65,7 +65,7 @@ describe "passive record models" do
             to eq("Family::Dog (id: #{dog.id.inspect}, breed: \"#{dog.breed}\", created_at: #{dog.created_at}, sound: \"bark\", child_id: #{child.id.inspect})")
 
           expect(child.inspect).
-            to eq("Family::Child (id: #{child.id.inspect}, created_at: #{child.created_at}, name: \"Alice\", toy_id: nil, toy_quality_ids: [], dog_ids: [#{dog.id.inspect}], parent_id: nil, secret_club_ids: [])")
+            to eq("Family::Child (id: #{child.id.inspect}, created_at: #{child.created_at}, name: \"Alice\", parent_id: nil, toy_id: nil, toy_quality_ids: [], dog_ids: [#{dog.id.inspect}], secret_club_ids: [])")
         end
       end
 
