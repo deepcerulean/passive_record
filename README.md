@@ -1,5 +1,7 @@
 # passive_record
 
+![passive record logo](https://raw.githubusercontent.com/deepcerulean/passive_record/master/logo.png)
+
 
 * [Documentation](https://rubygems.org/gems/passive_record)
 * [Email](mailto:joe at deepc.io)
