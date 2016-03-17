@@ -1,5 +1,3 @@
-# passive_record
-
 ![passive record logo](https://raw.githubusercontent.com/deepcerulean/passive_record/master/logo.png)
 
 
