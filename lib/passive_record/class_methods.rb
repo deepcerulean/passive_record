@@ -53,7 +53,9 @@ module PassiveRecord
       instance = new
 
       instance.singleton_class.class_eval { attr_accessor :id }
-      instance.send(:"id=", SecureRandomIdentifier.generate(self))
+
+      instance_id = attrs.delete(:id) { SecureRandomIdentifier.generate(self) }
+      instance.send(:id=, instance_id)
 
       register(instance)
 

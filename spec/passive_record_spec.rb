@@ -93,6 +93,10 @@ describe "passive record models" do
         it 'should assign attributes' do
           expect(model.foo).to eq('foo_value')
         end
+
+        it 'should assign ids' do
+          expect(SimpleModel.create(id: 'the_id').id).to eq('the_id')
+        end
       end
 
       describe "#destroy_all" do
