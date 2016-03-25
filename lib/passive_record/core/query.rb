@@ -83,7 +83,9 @@ module PassiveRecord
       def evaluate_condition(instance, field, value)
         if value.is_a?(Hash)
           evaluate_nested_conditions(instance, field, value)
-        elsif value.is_a?(Range) || value.is_a?(Array)
+        elsif value.is_a?(Range)
+          value.cover?(instance.send(field))
+        elsif value.is_a?(Array)
           value.include?(instance.send(field))
         else
           instance.send(field) == value

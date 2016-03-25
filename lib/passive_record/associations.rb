@@ -12,7 +12,7 @@ module PassiveRecord
     end
 
     def associations_id_syms
-      @associations&.map do |assn|
+      @associations && @associations.map do |assn|
         if assn.is_a?(HasOneAssociation) || assn.is_a?(BelongsToAssociation)
           (assn.target_name_symbol.to_s + "_id").to_sym
         else
@@ -27,7 +27,8 @@ module PassiveRecord
       associate!(association)
 
       define_method(:"#{parent_name_sym}_id") do
-        send(parent_name_sym)&.id
+        prnt = send(parent_name_sym)
+        prnt && prnt.id
       end
 
       define_method(parent_name_sym) do
@@ -51,7 +52,8 @@ module PassiveRecord
       associate!(association)
 
       define_method(:"#{child_name_sym}_id") do
-        send(child_name_sym)&.id
+        chld = send(child_name_sym)
+        chld && chld.id
       end
 
       define_method(child_name_sym) do
@@ -71,7 +73,8 @@ module PassiveRecord
       define_method(:"#{child_name_sym}_id=") do |new_child_id|
         relation = relata.detect { |rel| rel.association == association }
         # detach existing child...
-        relation.lookup&.send(:"#{relation.parent_model_id_field}=", nil)
+        rel = relation.lookup
+        rel && rel.send(:"#{relation.parent_model_id_field}=", nil)
 
         relation.child_class.
           find(new_child_id).

@@ -55,7 +55,7 @@ module PassiveRecord
     private
 
     def relata
-      @_relata ||= self.class.associations&.map do |assn|
+      @_relata ||= self.class.associations && self.class.associations.map do |assn|
         assn.to_relation(self)
       end || []
     end
