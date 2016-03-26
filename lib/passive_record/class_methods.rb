@@ -84,7 +84,7 @@ module PassiveRecord
     end
 
     def find_by_ids(ids)
-      instances_by_id.select { |id,_| ids.include?(id) }.values
+      instances_by_id.values_at(*ids)
     end
 
     private
