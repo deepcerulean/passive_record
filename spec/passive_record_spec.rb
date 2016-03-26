@@ -112,14 +112,11 @@ describe "passive record models" do
 
       context 'querying by id' do
         describe "#find" do
-          subject(:model) {  SimpleModel.create }
+          subject(:model) { SimpleModel.create(id: 'model_id') }
           it 'should lookup a record based on an identifier' do
             expect(SimpleModel.find(-1)).to eq(nil)
             expect(SimpleModel.find(model.id)).to eq(model)
-          end
-
-          it 'should lookup records based on primary key value' do
-            expect(SimpleModel.find(model.id.value)).to eq(model)
+            expect(SimpleModel.find('model_id')).to eq(model)
           end
 
           it 'should lookup records based on ids' do

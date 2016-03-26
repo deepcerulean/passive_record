@@ -5,7 +5,6 @@ require 'active_support/core_ext/string/inflections'
 require 'active_support/core_ext/numeric/time'
 
 require 'passive_record/version'
-require 'passive_record/core/identifier'
 
 require 'passive_record/arithmetic_helpers'
 require 'passive_record/core/query'

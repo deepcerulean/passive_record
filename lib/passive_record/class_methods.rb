@@ -15,11 +15,7 @@ module PassiveRecord
     def all
       instances_by_id.values
     end
-    def_delegators :all, :each
-
-    def last
-      all.last
-    end
+    def_delegators :all, :each, :last
 
     def find(id_or_ids)
       if id_or_ids.is_a?(Array)
@@ -54,7 +50,7 @@ module PassiveRecord
 
       instance.singleton_class.class_eval { attr_accessor :id }
 
-      instance_id = attrs.delete(:id) { SecureRandomIdentifier.generate(self) }
+      instance_id = attrs.delete(:id) { SecureRandom.uuid }
       instance.send(:id=, instance_id)
 
       register(instance)
@@ -84,7 +80,7 @@ module PassiveRecord
 
     protected
     def find_by_id(id_to_find)
-      find_by(id: id_to_find)
+      instances_by_id[id_to_find]
     end
 
     def find_by_ids(ids)
@@ -97,12 +93,9 @@ module PassiveRecord
     end
 
     def register(model)
-      instances_by_id[model.id] = model
+      id = model.id
+      instances_by_id[id] = model
       self
-    end
-
-    def id_factory
-      PassiveRecord.configuration.identify_using
     end
   end
 end
