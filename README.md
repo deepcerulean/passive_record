@@ -112,9 +112,9 @@ PassiveRecord may be right for you!
   - `User.destroy_all`
   - `User.each` enumerates over `User.all`, giving `User.count`, `User.first`, etc.
   - `User.find(id_or_ids)`
-  - `User.find_by(name: 'Aloysius')`
-  - `User.find_all_by(job: ['manager', 'developer', 'qa'])`
-  - `User.where(birthday: 1.day.ago...1.day.from_now)` (returns a `PassiveRecord::Query` object)
+  - `User.find_by(conditions)`
+  - `User.find_all_by(conditions)`
+  - `User.where(conditions)` (returns a `PassiveRecord::Query` object)
 
 ### Belongs To
 
