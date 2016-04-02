@@ -106,15 +106,15 @@ PassiveRecord may be right for you!
   A class `User` which is declared to `include PassiveRecord` will gain the following class methods:
 
   - `User.all` and `User.each`
-  - `User.create(attrs_hash)`
+  - `User.create(name: 'Aloysius')`
   - `User.descendants`
   - `User.destroy(id)`
   - `User.destroy_all`
   - `User.each` enumerates over `User.all`, giving `User.count`, `User.first`, etc.
   - `User.find(id_or_ids)`
-  - `User.find_all_by(conditions_hash)`
-  - `User.find_by(conditions_hash)`
-  - `User.where(conditions_hash)` (returns a `PassiveRecord::Query` object)
+  - `User.find_by(name: 'Aloysius')`
+  - `User.find_all_by(job: ['manager', 'developer', 'qa'])`
+  - `User.where(birthday: 1.day.ago...1.day.from_now)` (returns a `PassiveRecord::Query` object)
 
 ### Belongs To
 
@@ -183,9 +183,9 @@ PassiveRecord may be right for you!
 
   `conditions` here is expected to be a hash of attribute values. Note that there is special behavior for certain kinds of values.
 
-  - Ranges select models with an attribute covered by the range (behaving like `BETWEEN`)
-  - Arrays select models with an attribute whose value is in the array (behaving like `IN`)
-  - Hash values (subhashes) select models with related models who attributes match the inner hash. So `Doctor.where(appointments: { patient: patient })` finds doctors whose appointments include an appointment with `patient`.
+  - Ranges select models with an attribute covered by the range (behaving like `BETWEEN`). For instance you might query for users with birthdays between yesterday and today with `User.where(birthday: 1.day.ago...1.day.from_now)`
+  - Arrays select models with an attribute whose value is in the array (behaving like `IN`), so for instance you may query for users whose job title is included in a list of job titles like: `User.find_all_by(job_title: ['manager', 'developer', 'qa'])`
+  - Hash values (subhashes) select models with related models who attributes match the inner hash. So `Doctor.where(appointments: { patient: patient })` would lookup doctors whose appointments include an appointment with `patient`.
 
 ## Hooks
 
@@ -198,18 +198,8 @@ PassiveRecord may be right for you!
 
 # Prior Art
 
-  - Approaches exist that use ActiveRecord directly, and then override various methods in such a way to prevent AR from 
-    trying to persist the model. The canonical example here is the [tableless model](http://railscasts.com/episodes/193-tableless-model?view=asciicast)
-    approach, and the use case given there is a model that wraps around sending an email. This is maybe interesting because, similar to
-    the round-trip with a database, sending mail is externally "effectful" (and so, for instance, you may wish to take additional
-    care around confirmation or retry logic, in order ensure you are not sending the same message more than once.)
-  - These approaches are seen as somewhat hacky today, given that [ActiveModel](https://github.com/rails/rails/tree/master/activemodel) can 
-    give plain old Ruby objects a lot of the augmentations that ActiveRecord gives, such as validations, hooks and attribute management. However 
-    I don't really see a way to do relations that interoperate with ActiveRecord the way you could, at least to some degree, with tableless models.
-  - It's not really clear to me yet if it's interesting for PassiveRecord to be able to interoperate smoothly with ActiveRecord relations. It
-    seems like we might be able to pull some similar tricks as the "tableless" approach in order to permit at least some relations to work between them.
-    But their intentions are so different I can't help but think there would be very strange bugs lurking in any such integration -- so the encouraged
-    architecture would be a complete separation between active and passive models.
+  - Approaches exist that use ActiveRecord directly, and then override various methods in such a way to prevent AR from trying to persist the model. The canonical example here is the [tableless model](http://railscasts.com/episodes/193-tableless-model?view=asciicast) approach, and the use case given there is a model that wraps around sending an email. This is maybe interesting because, similar to the round-trip with a database, sending mail is externally "effectful" (and so, for instance, you may wish to take additional care around confirmation or retry logic, in order ensure you are not sending the same message more than once.)
+  - These approaches are seen as somewhat hacky today, given that [ActiveModel](https://github.com/rails/rails/tree/master/activemodel) can give plain old Ruby objects a lot of the augmentations that ActiveRecord gives, such as validations, hooks and attribute management. However I don't really see a way to do relations that interoperate with ActiveRecord the way you could, at least to some degree, with tableless models.  - It's not really clear to me yet if it's interesting for PassiveRecord to be able to interoperate smoothly with ActiveRecord relations. It seems like we might be able to pull some similar tricks as the "tableless" approach in order to permit at least some relations to work between them.  But their intentions are so different I can't help but think there would be very strange bugs lurking in any such integration -- so the encouraged architecture would be a complete separation between active and passive models.
 
 ## Copyright
 

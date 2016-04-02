@@ -72,7 +72,6 @@ module PassiveRecord
 
       define_method(:"#{child_name_sym}_id=") do |new_child_id|
         relation = relata.detect { |rel| rel.association == association }
-        # detach existing child...
         rel = relation.lookup
         rel && rel.send(:"#{relation.parent_model_id_field}=", nil)
 

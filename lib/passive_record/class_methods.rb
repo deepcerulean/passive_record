@@ -34,11 +34,7 @@ module PassiveRecord
     end
 
     def find_all_by(conditions)
-      if conditions.is_a?(Array) && conditions.all? { |c| c.is_a?(Identifier) }
-        find_by_ids(conditions)
-      else
-        where(conditions).all
-      end
+      where(conditions).all
     end
 
     def where(conditions={})
