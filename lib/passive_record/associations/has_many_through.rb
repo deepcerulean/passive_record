@@ -84,6 +84,13 @@ module PassiveRecord
           intermediary_relation.all
         end
       end
+
+      def where(conditions={})
+        child_class.where(conditions.merge(
+          intermediary_relation.association.children_name_sym.to_s.singularize.to_sym => {
+            parent_model_id_field.to_sym => parent_model.id
+          }))
+      end
     end
   end
 end

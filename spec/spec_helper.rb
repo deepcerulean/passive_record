@@ -102,8 +102,14 @@ end
 ###
 #
 
+class Feed < Model
+  has_many :blogs
+  has_many :posts, :through => :blogs
+end
+
 class Blog < Model
   has_many :posts
+  belongs_to :feed
 end
 
 class Post < Model
@@ -124,6 +130,12 @@ class Post < Model
 
   def self.published_within_days(n)
     where(:published_at => n.days.ago..Time.now)
+  end
+
+  # hmmm -- why *exactly* do we need this?
+  def feed_id
+    raise 'not impl'
+    # blog.feed_id
   end
 end
 

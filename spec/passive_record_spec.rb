@@ -260,7 +260,8 @@ describe "passive record models" do
         end
 
         context 'scopes on relations' do
-          let(:a_blog) { Blog.create }
+          let(:feed) { Feed.create }
+          let(:a_blog) { feed.create_blog } #.create }
           let(:not_recent_post) { a_blog.create_post(published_at: 10.days.ago) }
 
           let(:recent_post) do
@@ -271,6 +272,13 @@ describe "passive record models" do
             it 'should restrict as expected' do
               expect(a_blog.posts.recent).to include(recent_post)
               expect(a_blog.posts.recent).not_to include(not_recent_post)
+            end
+          end
+
+          describe 'should find related models on a has_many through' do
+            it 'should restrict as expected' do
+              expect(feed.posts.recent).to include(recent_post)
+              expect(feed.posts.recent).not_to include(not_recent_post)
             end
           end
         end
