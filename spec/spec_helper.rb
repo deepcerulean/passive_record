@@ -100,8 +100,14 @@ class Role < Model
 end
 
 ###
+#
+
+class Blog < Model
+  has_many :posts
+end
 
 class Post < Model
+  belongs_to :blog
   has_many :comments
   has_many :commenters, :through => :comments, :class_name => "User"
 

@@ -19,6 +19,7 @@ module PassiveRecord
       def all
         child_class.where(parent_model_id_field => parent_model.id).all
       end
+
       def_delegators :all, :each, :last, :all?, :empty?
 
       def where(conditions={})
@@ -32,6 +33,14 @@ module PassiveRecord
 
       def singular?
         false
+      end
+
+      def method_missing(meth,*args,&blk)
+        if child_class.methods.include?(meth)
+          where.send(meth,*args,&blk)
+        else
+          super(meth,*args,&blk)
+        end
       end
     end
   end
