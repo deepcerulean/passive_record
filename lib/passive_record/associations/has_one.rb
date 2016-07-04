@@ -8,6 +8,8 @@ module PassiveRecord
       def target_name_symbol
         child_name_sym
       end
+
+      def children_name_sym; child_name_sym end
     end
 
     class Relation < Struct.new(:association, :parent_model)

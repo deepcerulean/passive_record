@@ -102,7 +102,25 @@ end
 ###
 #
 
+class Network < Model
+  has_many :streams
+  has_many :posts, :through => :streams
+end
+
+class Stream < Model
+  belongs_to :network
+  has_many :channels
+  has_many :posts, :through => :channels
+end
+
+class Channel < Model
+  belongs_to :stream
+  has_many :feeds
+  has_many :posts, :through => :feeds
+end
+
 class Feed < Model
+  belongs_to :channel
   has_many :blogs
   has_many :posts, :through => :blogs
 end

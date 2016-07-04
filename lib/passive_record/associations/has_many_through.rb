@@ -4,6 +4,11 @@ module PassiveRecord
       def to_relation(parent_model)
         HasManyThroughRelation.new(self, parent_model)
       end
+
+      def nested_association
+        thru_klass = base_association.child_class_name.singularize.constantize
+        thru_klass.associations.detect { |assn| assn.child_class_name == child_class_name }
+      end
     end
 
     class HasManyThroughRelation < HasManyRelation
@@ -85,11 +90,33 @@ module PassiveRecord
         end
       end
 
-      def where(conditions={})
-        child_class.where(conditions.merge(
+      def intermediary_conditions
+        nested_conds = {
           intermediary_relation.association.children_name_sym.to_s.singularize.to_sym => {
             parent_model_id_field.to_sym => parent_model.id
-          }))
+          }
+        }
+
+        if nested_association.is_a?(HasManyThroughAssociation)
+          n = nested_association
+          hash = nested_conds
+          compound_key = []
+
+          until n.is_a?(HasManyAssociation)
+            key = n.through_class.to_s.singularize.to_sym
+            compound_key.push(key)
+            hash = {key => hash}
+            n = n.nested_association
+          end
+
+          hash
+        else
+          nested_conds
+        end
+      end
+
+      def where(conditions={})
+        child_class.where(conditions.merge(intermediary_conditions))
       end
     end
   end

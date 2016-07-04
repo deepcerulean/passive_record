@@ -98,7 +98,11 @@ module PassiveRecord
           if association.is_a?(Associations::Relation) && !association.singular?
             association.where(association_field => val).any?
           else
-            association.send(association_field) == val
+            if val.is_a?(Hash)
+              evaluate_nested_conditions(association, association_field, val)
+            else
+              association.send(association_field) == val
+            end
           end
         end
       end

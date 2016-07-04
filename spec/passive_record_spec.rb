@@ -177,6 +177,15 @@ describe "passive record models" do
             posts = Post.find_all_by comments: { user: user }
             expect(posts.count).to eq(2)
           end
+
+          it 'should find records through a doubly-nested query' do
+            feed = Feed.create
+            blog = feed.create_blog
+            post = blog.create_post
+
+            # expect( Post.find_by(blog: { feed_id: feed.id }) ).to eq(post)
+            expect( Post.find_by(blog: { feed: { id: feed.id }}) ).to eq(post)
+          end
         end
 
         context 'queries with ranges' do
@@ -259,26 +268,49 @@ describe "passive record models" do
           end
         end
 
-        context 'scopes on relations' do
-          let(:feed) { Feed.create }
-          let(:a_blog) { feed.create_blog } #.create }
-          let(:not_recent_post) { a_blog.create_post(published_at: 10.days.ago) }
-
-          let(:recent_post) do
+        context 'querying with scopes through relationships' do
+          let!(:network) { Network.create }
+          let!(:stream) { network.create_stream }
+          let!(:channel) { stream.create_channel }
+          let!(:feed) { channel.create_feed }
+          let!(:a_blog) { feed.create_blog }
+          let!(:not_recent_post) { a_blog.create_post(published_at: 10.days.ago) }
+          let!(:recent_post) do
             a_blog.create_post(published_at: 1.day.ago)
           end
 
           describe 'should find related models through a has many' do
-            it 'should restrict as expected' do
+            it 'should restrict' do
               expect(a_blog.posts.recent).to include(recent_post)
               expect(a_blog.posts.recent).not_to include(not_recent_post)
             end
           end
 
           describe 'should find related models on a has_many through' do
-            it 'should restrict as expected' do
+            it 'should restrict' do
               expect(feed.posts.recent).to include(recent_post)
               expect(feed.posts.recent).not_to include(not_recent_post)
+            end
+          end
+
+          describe 'should find related models on a nested has_many thru' do
+            it 'should restrict' do
+              expect(channel.posts.recent).to include(recent_post)
+              expect(channel.posts.recent).not_to include(not_recent_post)
+            end
+          end
+
+          describe 'should find related models on a double-nested has_many thru' do
+            it 'should restrict' do
+              expect(stream.posts.recent).to include(recent_post)
+              expect(stream.posts.recent).not_to include(not_recent_post)
+            end
+          end
+
+          describe 'should find related models on a deeply nested has_many thru' do
+            it 'should restrict' do
+              expect(network.posts.recent).to include(recent_post)
+              expect(network.posts.recent).not_to include(not_recent_post)
             end
           end
         end
