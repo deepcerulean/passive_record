@@ -94,7 +94,7 @@ module PassiveRecord
 
       def evaluate_nested_conditions(instance, field, value)
         association = instance.send(field)
-        association && value.all? do |(association_field,val)|
+        association && value.any? do |(association_field,val)|
           if association.is_a?(Associations::Relation) && !association.singular?
             association.where(association_field => val).any?
           else
