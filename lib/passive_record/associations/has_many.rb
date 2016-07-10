@@ -20,7 +20,7 @@ module PassiveRecord
         child_class.where(parent_model_id_field => parent_model.id).all
       end
 
-      def_delegators :all, :each, :last, :all?, :empty?
+      def_delegators :all, :each, :last, :all?, :empty?, :sample
 
       def where(conditions={})
         child_class.where(conditions.merge(parent_model_id_field.to_sym => parent_model.id))

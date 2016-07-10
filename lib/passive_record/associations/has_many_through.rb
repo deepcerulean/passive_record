@@ -91,20 +91,22 @@ module PassiveRecord
       end
 
       def intermediary_conditions
-        nested_conds = {
-          intermediary_relation.association.children_name_sym.to_s.singularize.to_sym => {
-            parent_model_id_field.to_sym => parent_model.id
-          }
-        }
+        intermediary_key = if intermediary_relation.association.is_a?(HasManyAssociation)
+                             intermediary_relation.association.children_name_sym.to_s.singularize.to_sym
+                           elsif intermediary_relation.association.is_a?(HasManyThroughAssociation)
+                             intermediary_relation.association.through_class.to_s.singularize.to_sym
+                           else 
+                             raise "Intermediary association #{intermediary_relation.association} is not has many or has many through...?"
+                           end
+        
+        nested_conds = { intermediary_key => { parent_model_id_field.to_sym => parent_model.id } }
 
         if nested_association.is_a?(HasManyThroughAssociation)
           n = nested_association
           hash = nested_conds
-          compound_key = []
 
-          until n.is_a?(HasManyAssociation)
+          until !n.is_a?(HasManyThroughAssociation)
             key = n.through_class.to_s.singularize.to_sym
-            compound_key.push(key)
             hash = {key => hash}
             n = n.nested_association
           end

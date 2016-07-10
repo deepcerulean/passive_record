@@ -5,6 +5,8 @@ module PassiveRecord
       extend Forwardable
       include PassiveRecord::ArithmeticHelpers
 
+      attr_reader :conditions
+
       def initialize(klass,conditions={},scope=nil)
         @klass = klass
         @conditions = conditions
@@ -20,19 +22,41 @@ module PassiveRecord
       end
 
       def all
-        return [] unless @conditions
-        matching = method(:matching_instances)
         if @scope
+          matching = @scope.method(:matching_instances)
           if negated?
-            @klass.reject(&@scope.method(:matching_instances))
+            @klass.reject(&matching)
           else
-            @klass.select(&@scope.method(:matching_instances))
+            @klass.select(&matching)
           end
         else
+          matching = method(:matching_instances)
           @klass.select(&matching)
         end
       end
-      def_delegators :all, :each
+      def_delegators :all, :sample
+
+      def each
+        if @scope
+          matching = @scope.method(:matching_instances)
+          if negated?
+            @klass.all.each do |instance| #reject(&matching)
+              yield instance unless matching[instance]
+            end
+          else
+            @klass.all.each do |instance|
+              yield instance if matching[instance]
+            end
+            # @klass.select(&matching)
+          end
+        else
+          matching = method(:matching_instances)
+          @klass.all.each do |instance|
+            yield instance if matching[instance]
+          end
+          # @klass.select(&matching)
+        end
+      end
 
       def matching_instances(instance)
         @conditions.all? do |(field,value)|
@@ -49,7 +73,7 @@ module PassiveRecord
       end
 
       def where(new_conditions={})
-        @conditions = new_conditions.merge(@conditions)
+        @conditions.merge!(new_conditions)
         self
       end
 
@@ -59,6 +83,14 @@ module PassiveRecord
 
       def disjoined?
         false
+      end
+
+      def conjoined?
+        false
+      end
+
+      def basic?
+        !negated? && !disjoined? && !conjoined?
       end
 
       def and(scope_query)
@@ -71,6 +103,9 @@ module PassiveRecord
           if negated? && @scope.nil? && @conditions.empty?
             @scope = scope_query
             self
+          elsif basic? && scope_query.basic?
+            @conditions.merge!(scope_query.conditions)
+            self
           else
             scope_query.and(self)
           end
@@ -81,12 +116,10 @@ module PassiveRecord
 
       protected
       def evaluate_condition(instance, field, value)
-        if value.is_a?(Hash)
-          evaluate_nested_conditions(instance, field, value)
-        elsif value.is_a?(Range)
-          value.cover?(instance.send(field))
-        elsif value.is_a?(Array)
-          value.include?(instance.send(field))
+        case value
+        when Hash  then evaluate_nested_conditions(instance, field, value)
+        when Range then value.cover?(instance.send(field))
+        when Array then value.include?(instance.send(field))
         else
           instance.send(field) == value
         end
@@ -94,15 +127,13 @@ module PassiveRecord
 
       def evaluate_nested_conditions(instance, field, value)
         association = instance.send(field)
-        association && value.any? do |(association_field,val)|
+        association && value.all? do |(association_field,val)|
           if association.is_a?(Associations::Relation) && !association.singular?
             association.where(association_field => val).any?
+          elsif val.is_a?(Hash)
+            evaluate_nested_conditions(association, association_field, val)
           else
-            if val.is_a?(Hash)
-              evaluate_nested_conditions(association, association_field, val)
-            else
-              association.send(association_field) == val
-            end
+            association.send(association_field) == val
           end
         end
       end
@@ -145,6 +176,14 @@ module PassiveRecord
 
       def all
         @first_query.all & @second_query.all
+      end
+
+      def where(new_conditions={})
+        @first_query.where(new_conditions)
+      end
+
+      def conjoined?
+        true
       end
     end
   end
