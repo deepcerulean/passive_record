@@ -19,7 +19,7 @@ end
 describe "passive record models" do
   before(:each) { PassiveRecord.drop_all }
 
-  context "with a simple model including PR" do
+  context "a simple model including PR" do
     let!(:model) { SimpleModel.create(foo: value) }
     let(:value) { 'foo_value' }
 
@@ -72,6 +72,7 @@ describe "passive record models" do
       describe "#id" do
         it 'should be retrievable by id' do
           expect(SimpleModel.find_by(model.id)).to eq(model)
+          expect(SimpleModel.find(model.id)).to eq(model)
         end
       end
     end
@@ -216,17 +217,35 @@ describe "passive record models" do
         end
 
         context 'queries with disjunctions' do
-          it 'should find where attributes match EITHER query' do
-            pom = Family::Dog.create breed: 'pom'
-            pug = Family::Dog.create breed: 'pug'
-            Family::Dog.create breed: 'mutt'
-            Family::Dog.create breed: 'lab'
-            Family::Dog.create breed: 'papillon'
+          let(:poms_or_pugs) do
+            Family::Dog.
+              where(breed: 'pom').or(Family::Dog.where(breed: 'pug'))
+          end
 
+          let(:poms_or_small_dogs) do
+            Family::Dog.
+              where(breed: 'pom').or(Family::Dog.where(size: %w[ tiny small ]))
+          end
+
+          before do
+            @pom = Family::Dog.create(breed: 'pom', size: 'tiny')
+            @pug = Family::Dog.create(breed: 'pug', size: 'big')
+
+            Family::Dog.create(breed: 'mutt', size: 'medium')
+            Family::Dog.create(breed: 'lab', size: 'large')
+
+            @pap = Family::Dog.create(breed: 'papillon', size: 'small')
+          end
+
+          it 'should find where attributes match EITHER query' do
+            expect(poms_or_pugs.all).to eq([@pom, @pug])
+            expect(poms_or_small_dogs.all).to eq([@pom, @pap])
+          end
+
+          it 'should be able to refine a disjunction' do
             expect(
-              Family::Dog.
-                where(breed: 'pom').or(Family::Dog.where(breed: 'pug')).all
-            ).to eq([pom, pug])
+              poms_or_pugs.where(size: %w[ tiny small ]).all
+            ).to eq([@pom])
           end
         end
 

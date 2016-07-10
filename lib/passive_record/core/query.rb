@@ -40,21 +40,19 @@ module PassiveRecord
         if @scope
           matching = @scope.method(:matching_instances)
           if negated?
-            @klass.all.each do |instance| #reject(&matching)
+            @klass.all.each do |instance|
               yield instance unless matching[instance]
             end
           else
             @klass.all.each do |instance|
               yield instance if matching[instance]
             end
-            # @klass.select(&matching)
           end
         else
           matching = method(:matching_instances)
           @klass.all.each do |instance|
             yield instance if matching[instance]
           end
-          # @klass.select(&matching)
         end
       end
 
@@ -152,14 +150,15 @@ module PassiveRecord
     end
 
     class DisjoinedQuery < Query
-      def initialize(klass, first_query, second_query)
+      def initialize(klass, first_query, second_query, conditions={})
         @klass = klass
         @first_query = first_query
         @second_query = second_query
+        @conditions = conditions
       end
 
       def all
-        (@first_query.all + @second_query.all).uniq
+        (@first_query.where(conditions).all + @second_query.where(conditions).all).uniq
       end
 
       def disjoined?
@@ -168,18 +167,15 @@ module PassiveRecord
     end
 
     class ConjoinedQuery < Query
-      def initialize(klass, first_query, second_query)
+      def initialize(klass, first_query, second_query, conditions={})
         @klass = klass
         @first_query = first_query
         @second_query = second_query
+        @conditions = conditions
       end
 
       def all
-        @first_query.all & @second_query.all
-      end
-
-      def where(new_conditions={})
-        @first_query.where(new_conditions)
+        @first_query.where(conditions).all & @second_query.all
       end
 
       def conjoined?
