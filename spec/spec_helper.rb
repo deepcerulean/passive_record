@@ -105,6 +105,7 @@ end
 class Network < Model
   has_many :streams
   has_many :posts, :through => :streams
+  has_many :comments, :through => :posts
 end
 
 class Stream < Model
@@ -131,9 +132,10 @@ class Blog < Model
 end
 
 class Post < Model
+  belongs_to :author
   belongs_to :blog
   has_many :comments
-  has_many :commenters, :through => :comments, :class_name => "User"
+  has_many :commenters, :through => :comments, :class_name => "Author"
 
   attr_accessor :active, :published_at
   before_create { @published_at = Time.now }
@@ -149,19 +151,18 @@ class Post < Model
   def self.published_within_days(n)
     where(:published_at => n.days.ago..Time.now)
   end
-
-  # hmmm -- why *exactly* do we need this?
-  def feed_id
-    raise 'not impl'
-    # blog.feed_id
-  end
 end
 
-class User < Model
+# whoa, we're reopening user here -- this might not be expected
+class Author < Model
+  has_many :posts
   has_many :comments
 end
 
 class Comment < Model
+  attr_accessor :approved
   belongs_to :post
-  belongs_to :user
+  belongs_to :author
+
+  def self.approved; where(approved: true) end
 end

@@ -91,29 +91,28 @@ module PassiveRecord
       end
 
       def intermediary_conditions
-        intermediary_key = if intermediary_relation.association.is_a?(HasManyAssociation)
-                             intermediary_relation.association.children_name_sym.to_s.singularize.to_sym
-                           elsif intermediary_relation.association.is_a?(HasManyThroughAssociation)
-                             intermediary_relation.association.through_class.to_s.singularize.to_sym
-                           else 
-                             raise "Intermediary association #{intermediary_relation.association} is not has many or has many through...?"
-                           end
-        
-        nested_conds = { intermediary_key => { parent_model_id_field.to_sym => parent_model.id } }
+        if intermediary_relation.association.is_a?(HasManyThroughAssociation)
+          # we are 'thru' a has_many thru at the same level, we should be able to recurse thru its #intermediary_conds
+          conds = intermediary_relation.intermediary_conditions
+          { association.through_class.to_s.singularize.to_sym => conds }
+        elsif intermediary_relation.association.is_a?(HasManyAssociation) # normal has many?
+          intermediary_key = intermediary_relation.association.children_name_sym.to_s.singularize.to_sym
+          nested_conds = { intermediary_key => { parent_model_id_field.to_sym => parent_model.id } }
 
-        if nested_association.is_a?(HasManyThroughAssociation)
-          n = nested_association
-          hash = nested_conds
+          if nested_association.is_a?(HasManyThroughAssociation)
+            n = nested_association
+            hash = nested_conds
 
-          until !n.is_a?(HasManyThroughAssociation)
-            key = n.through_class.to_s.singularize.to_sym
-            hash = {key => hash}
-            n = n.nested_association
+            until !n.is_a?(HasManyThroughAssociation)
+              key = n.through_class.to_s.singularize.to_sym
+              hash = {key => hash}
+              n = n.nested_association
+            end
+
+            hash
+          else
+            nested_conds
           end
-
-          hash
-        else
-          nested_conds
         end
       end
 

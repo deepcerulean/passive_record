@@ -157,14 +157,14 @@ describe "passive record models" do
 
         context 'nested queries' do
           let(:post) { Post.create }
-          let(:user) { User.create }
+          let(:author) { Author.create }
 
           subject(:posts_with_comment_by_user) do
-            Post.find_by comments: { user: user }
+            Post.find_by comments: { author: author }
           end
 
           before do
-            post.create_comment(user: user)
+            post.create_comment(author: author)
           end
 
           it 'should find a single record through a nested query' do
@@ -173,9 +173,9 @@ describe "passive record models" do
 
           it 'should find multiple records through a nested query' do
             another_post = Post.create
-            another_post.create_comment(user: user)
+            another_post.create_comment(author: author)
 
-            posts = Post.find_all_by comments: { user: user }
+            posts = Post.find_all_by comments: { author: author }
             expect(posts.count).to eq(2)
           end
 
@@ -330,6 +330,16 @@ describe "passive record models" do
             it 'should restrict' do
               expect(network.posts.recent).to include(recent_post)
               expect(network.posts.recent).not_to include(not_recent_post)
+            end
+          end
+
+          describe 'should find related models on a recursive has_many thru' do
+            let!(:approved_comment) { Post.first.create_comment(approved: true) }
+            let!(:unapproved_comment) { Post.last.create_comment(approved: false) }
+
+            it 'should refine/restrict' do
+              expect(network.comments.approved).to include(approved_comment)
+              expect(network.comments.approved).not_to include(unapproved_comment)
             end
           end
         end
@@ -501,10 +511,10 @@ describe "passive record models" do
 
       it 'should accept class name' do
         post = Post.create
-        user = User.create
-        Comment.create(post: post, user: user)
+        author = Author.create
+        Comment.create(post: post, author: author)
 
-        expect(post.commenters.all).to eq([user])
+        expect(post.commenters.all).to eq([author])
       end
     end
 
