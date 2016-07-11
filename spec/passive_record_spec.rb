@@ -342,6 +342,16 @@ describe "passive record models" do
               expect(network.comments.approved).not_to include(unapproved_comment)
             end
           end
+
+          describe 'should find related models a recursive has_many :thru a habtm' do
+            let!(:promoted_tag) { Post.first.create_tag(promoted: true) }
+            let!(:unpromoted_tag) { Post.last.create_tag(promoted: false) }
+
+            it 'should refine and restrict' do
+              expect(network.tags.promoted).to include(promoted_tag)
+              expect(network.tags.promoted).not_to include(unpromoted_tag)
+            end
+          end
         end
       end
     end

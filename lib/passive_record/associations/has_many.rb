@@ -8,6 +8,10 @@ module PassiveRecord
       def target_name_symbol
         children_name_sym
       end
+
+      def habtm
+        false #@habtm ||= false 
+      end #?
     end
 
     class HasManyRelation < HasOneRelation

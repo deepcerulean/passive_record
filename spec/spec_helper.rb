@@ -106,6 +106,7 @@ class Network < Model
   has_many :streams
   has_many :posts, :through => :streams
   has_many :comments, :through => :posts
+  has_many :tags, :through => :posts
 end
 
 class Stream < Model
@@ -131,11 +132,18 @@ class Blog < Model
   belongs_to :feed
 end
 
+class Tag < Model
+  has_and_belongs_to_many :posts
+  attr_accessor :promoted
+  def self.promoted; where(promoted: true) end
+end
+
 class Post < Model
   belongs_to :author
   belongs_to :blog
   has_many :comments
   has_many :commenters, :through => :comments, :class_name => "Author"
+  has_and_belongs_to_many :tags
 
   attr_accessor :active, :published_at
   before_create { @published_at = Time.now }

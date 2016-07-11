@@ -83,6 +83,7 @@ module PassiveRecord
 
     def has_many(collection_name_sym, opts={})
       target_class_name = opts.delete(:class_name) { (collection_name_sym.to_s).split('_').map(&:capitalize).join }
+      habtm = opts.delete(:habtm) { false }
 
       association = nil
       if opts.key?(:through)
@@ -92,7 +93,7 @@ module PassiveRecord
         base_association = associations.detect { |assn| assn.child_class_name == through_class_name rescue false }
 
         association = HasManyThroughAssociation.new(
-          self, target_class_name, collection_name_sym, through_class_collection_name, base_association)
+          self, target_class_name, collection_name_sym, through_class_collection_name, base_association, habtm)
 
         associate!(association)
 
@@ -180,7 +181,7 @@ module PassiveRecord
 
       if (intended_module.const_get(inverse_habtm_join_class_name) rescue false)
         has_many inverse_habtm_join_class_name.underscore.pluralize.to_sym
-        has_many collection_name_sym, :through => inverse_habtm_join_class_name.underscore.pluralize.to_sym
+        has_many collection_name_sym, :through => inverse_habtm_join_class_name.underscore.pluralize.to_sym, habtm: true
       else
         auto_collection_sym = self.name.split('::').last.underscore.pluralize.to_sym
         eval <<-ruby
@@ -191,7 +192,7 @@ module PassiveRecord
         end                                                     # end
         ruby
         has_many habtm_join_class_name.underscore.pluralize.to_sym
-        has_many(collection_name_sym, :through => habtm_join_class_name.underscore.pluralize.to_sym)
+        has_many(collection_name_sym, :through => habtm_join_class_name.underscore.pluralize.to_sym, habtm: true)
       end
     end
   end
