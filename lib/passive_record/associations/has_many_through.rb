@@ -79,6 +79,7 @@ module PassiveRecord
       end
 
       def intermediary_relation
+        # binding.pry
         @intermediary_relation ||= association.base_association.to_relation(parent_model)
       end
 
@@ -100,11 +101,29 @@ module PassiveRecord
             { association.through_class.to_s.singularize.to_sym => conds }
           end
         elsif intermediary_relation.association.is_a?(HasManyAssociation) # normal has many?
-          intermediary_key = if association.habtm
+          intermediary_key = if association.is_a?(HasManyThroughAssociation)
+                               ch = association.child_class_name.constantize
+                               inverse_assn = ch.associations.detect { |assn| 
+                                 if assn.is_a?(HasManyAssociation) || assn.is_a?(HasManyThroughAssociation)
+                                   assn.child_class_name == association.base_association.child_class_name
+                                 else # belongs to...
+                                   assn.parent_class_name == association.base_association.child_class_name
+                                 end
+                               }
+
+                               if inverse_assn.nil?
+                                 association.through_class.to_s.singularize.to_sym
+                               elsif inverse_assn.is_a?(HasManyAssociation) || inverse_assn.is_a?(HasManyThroughAssociation)
+                                 inverse_assn.children_name_sym
+                               else
+                                 inverse_assn.target_name_symbol
+                               end
+                             elsif association.habtm
                                association.base_association.children_name_sym
                              else
-                               intermediary_relation.association.children_name_sym.to_s.singularize.to_sym
+                               association.base_association.children_name_sym.to_s.singularize.to_sym
                              end
+
           nested_conds = { intermediary_key => { parent_model_id_field.to_sym => parent_model.id } }
 
           if nested_association.is_a?(HasManyThroughAssociation)

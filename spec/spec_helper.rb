@@ -92,11 +92,26 @@ end
 class User < Model
   has_many :friendships
   has_many :friends, :through => :friendships
+
   has_and_belongs_to_many :roles
+
+  has_many :resource_allocations
+  has_many :resources, :through => :resource_allocations
 end
 
 class Role < Model
   has_and_belongs_to_many :users
+end
+
+class ResourceAllocation < Model
+  belongs_to :user
+  belongs_to :resource
+end
+
+class Resource < Model
+  # TODO why can't we use a custom class name here???
+  has_many :resource_allocations #, class_name: "ResourceAllocation"
+  has_many :users, through: :resource_allocations
 end
 
 ###
@@ -161,7 +176,6 @@ class Post < Model
   end
 end
 
-# whoa, we're reopening user here -- this might not be expected
 class Author < Model
   has_many :posts
   has_many :comments

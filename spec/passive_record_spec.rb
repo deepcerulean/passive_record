@@ -562,6 +562,27 @@ describe "passive record models" do
       end
     end
 
+    context 'manual habtm' do
+      let!(:resource) { Resource.create }
+      let!(:user) { User.create }
+
+      it 'should permit relations' do
+        expect(user.resources).to be_empty
+        expect(resource.users).to be_empty
+
+        ResourceAllocation.create(user: user, resource: resource)
+
+        expect(user.resources).to include(resource)
+        expect(resource.users).to include(user)
+      end
+
+      it 'should permit querying' do
+        ResourceAllocation.create(user: user, resource: resource)
+        # binding.pry
+        expect(user.resources.where.all).to include(resource)
+      end
+    end
+
     context 'direct habtm' do
       before(:each) { PassiveRecord.drop_all }
       let!(:user) { User.create roles: [role] }

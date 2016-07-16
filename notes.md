@@ -40,3 +40,37 @@ Post.where(blog: { feed: { channel: { stream: 890 }}})
 Post.where(published_at: 1.day.ago...Time.now, blog: { feed: { channel: { stream: { network_id: 1234 }}}})
 
 
+---------
+
+
+
+Okay, so in this case we are trying to do `feed.posts.recent` ....
+
+=> #<struct PassiveRecord::Associations::HasManyThroughAssociation
+ parent_class=Feed,
+ child_class_name="Post",
+ target_name_symbol=:posts,
+ through_class=:blogs,
+ base_association=#<struct PassiveRecord::Associations::HasManyAssociation parent_class=Feed, child_class_name="Blog", children_name_sym=:blogs>,
+ habtm=false>
+
+We are constructing a query on `Post`, and want to say {blog: {feed_id: ...}} ...
+
+The through_class is :blogs which needs to be singularized
+
+---
+
+In the other case we are just trying to do `user.resources.where ...` ...
+
+=> #<struct PassiveRecord::Associations::HasManyThroughAssociation
+ parent_class=User,
+ child_class_name="Resource",
+ target_name_symbol=:resources,
+ through_class=:resource_allocations,
+ base_association=#<struct PassiveRecord::Associations::HasManyAssociation parent_class=User, child_class_name="ResourceAllocation", children_name_sym=:resource_allocations>,
+ habtm=false>
+
+We are constructing a query on `Resource` ...
+
+We need to check from the perspective of `Resource` what the relation is to allocations...?
+

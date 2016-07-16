@@ -82,14 +82,15 @@ module PassiveRecord
     end
 
     def has_many(collection_name_sym, opts={})
-      target_class_name = opts.delete(:class_name) { (collection_name_sym.to_s).split('_').map(&:capitalize).join }
+      target_class_name = opts.delete(:class_name) { (collection_name_sym.to_s).split('_').map(&:capitalize).join.singularize }
       habtm = opts.delete(:habtm) { false }
 
       association = nil
       if opts.key?(:through)
         through_class_collection_name = opts.delete(:through)
 
-        through_class_name = (through_class_collection_name.to_s).split('_').map(&:capitalize).join
+        through_class_name = (through_class_collection_name.to_s).split('_').map(&:capitalize).join.singularize
+        # binding.pry if through_class_collection_name == :blogs
         base_association = associations.detect { |assn| assn.child_class_name == through_class_name rescue false }
 
         association = HasManyThroughAssociation.new(
@@ -180,8 +181,8 @@ module PassiveRecord
       intended_module = module_name.constantize
 
       if (intended_module.const_get(inverse_habtm_join_class_name) rescue false)
-        has_many inverse_habtm_join_class_name.underscore.pluralize.to_sym
-        has_many collection_name_sym, :through => inverse_habtm_join_class_name.underscore.pluralize.to_sym, habtm: true
+        has_many inverse_habtm_join_class_name.underscore.to_sym
+        has_many collection_name_sym, :through => inverse_habtm_join_class_name.underscore.to_sym, habtm: true
       else
         auto_collection_sym = self.name.split('::').last.underscore.pluralize.to_sym
         eval <<-ruby
@@ -191,8 +192,8 @@ module PassiveRecord
           belongs_to :#{auto_collection_sym.to_s.singularize}   #   belongs_to :user
         end                                                     # end
         ruby
-        has_many habtm_join_class_name.underscore.pluralize.to_sym
-        has_many(collection_name_sym, :through => habtm_join_class_name.underscore.pluralize.to_sym, habtm: true)
+        has_many habtm_join_class_name.underscore.to_sym
+        has_many(collection_name_sym, :through => habtm_join_class_name.underscore.to_sym, habtm: true)
       end
     end
   end
