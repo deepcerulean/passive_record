@@ -31,7 +31,6 @@ module PassiveRecord
               )
           end
         else
-          # binding.pry
           intermediary_model = intermediary_relation.
             where(
               association.target_name_symbol.to_s.singularize + "_id" => child.id).
@@ -80,7 +79,6 @@ module PassiveRecord
       end
 
       def intermediary_relation
-        # binding.pry
         @intermediary_relation ||= association.base_association.to_relation(parent_model)
       end
 
@@ -133,12 +131,9 @@ module PassiveRecord
 
             until !n.is_a?(HasManyThroughAssociation)
               key = n.through_class.to_s.singularize.to_sym
-              p [ :n_class, n.class, key ] 
               hash = {key => hash}
               n = n.nested_association
             end
-
-            # binding.pry
 
             hash
           else
@@ -149,7 +144,6 @@ module PassiveRecord
 
       def where(conditions={})
         merged_conditions = conditions.merge(intermediary_conditions)
-        # binding.pry
         child_class.where(merged_conditions)
       end
     end

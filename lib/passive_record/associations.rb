@@ -90,7 +90,6 @@ module PassiveRecord
         through_class_collection_name = opts.delete(:through)
 
         through_class_name = (through_class_collection_name.to_s).split('_').map(&:capitalize).join.singularize
-        # binding.pry if through_class_collection_name == :blogs
         base_association = associations.detect { |assn| assn.child_class_name == through_class_name rescue false }
 
         association = HasManyThroughAssociation.new(
