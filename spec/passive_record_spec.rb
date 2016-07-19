@@ -352,6 +352,16 @@ describe "passive record models" do
               expect(network.tags.promoted).not_to include(unpromoted_tag)
             end
           end
+
+          describe 'should find related nested models through a manual habtm' do
+            let!(:special_category) { Post.first.create_category(special: true) }
+            let!(:unspecial_category) { Post.last.create_category(special: false) }
+
+            it 'should refine and restrict' do
+              expect(network.categories.special).to include(special_category)
+              expect(network.categories.special).not_to include(unspecial_category)
+            end
+          end
         end
       end
     end
@@ -578,7 +588,6 @@ describe "passive record models" do
 
       it 'should permit querying' do
         ResourceAllocation.create(user: user, resource: resource)
-        # binding.pry
         expect(user.resources.where.all).to include(resource)
       end
     end

@@ -122,6 +122,7 @@ class Network < Model
   has_many :posts, :through => :streams
   has_many :comments, :through => :posts
   has_many :tags, :through => :posts
+  has_many :categories, :through => :posts
 end
 
 class Stream < Model
@@ -153,12 +154,28 @@ class Tag < Model
   def self.promoted; where(promoted: true) end
 end
 
+class Category < Model
+  attr_accessor :special
+  has_many :post_categories
+  has_many :posts, :through => :post_categories
+
+  def self.special; where(special: true) end
+end
+
+class PostCategory < Model
+  belongs_to :post
+  belongs_to :category
+end
+
 class Post < Model
   belongs_to :author
   belongs_to :blog
   has_many :comments
   has_many :commenters, :through => :comments, :class_name => "Author"
   has_and_belongs_to_many :tags
+
+  has_many :post_categories
+  has_many :categories, :through => :post_categories
 
   attr_accessor :active, :published_at
   before_create { @published_at = Time.now }
