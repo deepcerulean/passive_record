@@ -6,9 +6,11 @@ module PassiveRecord
       end
 
       def parent_class
-	module_name = child_class.name.deconstantize
-	module_name = "Object" if module_name.empty?
-	(module_name.constantize).const_get(parent_class_name)
+        @parent_class ||= (
+          module_name = child_class.name.deconstantize
+          module_name = "Object" if module_name.empty?
+          (module_name.constantize).const_get(parent_class_name)
+        )
       end
 
       def child_class_name

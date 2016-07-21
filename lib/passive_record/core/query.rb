@@ -25,26 +25,30 @@ module PassiveRecord
         if @scope
           matching = @scope.method(:matching_instances)
           if negated?
-            @klass.reject(&matching)
+            raw_all.reject(&matching)
           else
-            @klass.select(&matching)
+            raw_all.select(&matching)
           end
         else
           matching = method(:matching_instances)
-          @klass.select(&matching)
+          raw_all.select(&matching)
         end
       end
       def_delegators :all, :sample
+
+      def raw_all
+        @klass.all
+      end
 
       def each
         if @scope
           matching = @scope.method(:matching_instances)
           if negated?
-            @klass.all.each do |instance|
+            raw_all.each do |instance|
               yield instance unless matching[instance]
             end
           else
-            @klass.all.each do |instance|
+            raw_all.each do |instance|
               yield instance if matching[instance]
             end
           end
@@ -180,6 +184,19 @@ module PassiveRecord
 
       def conjoined?
         true
+      end
+    end
+
+    class HasManyThroughQuery < Query
+      def initialize(klass, instance, target_name_sym, conditions={})
+        @klass = klass
+        @instance = instance
+        @target_name_sym = target_name_sym
+        @conditions = conditions
+      end
+
+      def raw_all
+        @instance.send(@target_name_sym).all
       end
     end
   end

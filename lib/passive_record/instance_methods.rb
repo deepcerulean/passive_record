@@ -52,6 +52,13 @@ module PassiveRecord
       []
     end
 
+    def detect_relation(assn)
+      @_associations ||= {}
+      @_associations[assn] ||= (
+        relata.detect { |rel| rel.association == assn }
+      )
+    end
+
     private
 
     def relata

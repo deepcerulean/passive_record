@@ -32,7 +32,7 @@ module PassiveRecord
       end
 
       define_method(parent_name_sym) do
-        relation = relata.detect { |rel| rel.association == association }
+        relation = detect_relation(association)
         association.parent_class.find(relation.parent_model_id)
       end
 
@@ -41,7 +41,7 @@ module PassiveRecord
       end
 
       define_method(:"#{parent_name_sym}_id=") do |new_parent_id|
-        relation = relata.detect { |rel| rel.association == association }
+        relation = detect_relation(association)
         relation.parent_model_id = new_parent_id
       end
     end
@@ -57,12 +57,12 @@ module PassiveRecord
       end
 
       define_method(child_name_sym) do
-        relation = relata.detect { |rel| rel.association == association }
+        relation = detect_relation(association)
         relation.lookup
       end
 
       define_method(:"create_#{child_name_sym}") do |attrs={}|
-        relation = relata.detect { |rel| rel.association == association }
+        relation = detect_relation(association)
         relation.create(attrs)
       end
 
@@ -71,7 +71,7 @@ module PassiveRecord
       end
 
       define_method(:"#{child_name_sym}_id=") do |new_child_id|
-        relation = relata.detect { |rel| rel.association == association }
+        relation = detect_relation(association) #relata.detect { |rel| rel.association == association }
         rel = relation.lookup
         rel && rel.send(:"#{relation.parent_model_id_field}=", nil)
 
@@ -102,7 +102,7 @@ module PassiveRecord
         end
 
         define_method(:"#{collection_name_sym.to_s.singularize}_ids=") do |new_collection_ids|
-          relation = relata.detect { |rel| rel.association == association }
+          relation = detect_relation(association) # relata.detect { |rel| rel.association == association }
 
           intermediary = relation.intermediary_relation
 
@@ -113,16 +113,16 @@ module PassiveRecord
 
           # add in new ones...
           singular_target = collection_name_sym.to_s.singularize
-          if !(relation.nested_association.is_a?(BelongsToAssociation))# && 
+          if !(relation.nested_association.is_a?(BelongsToAssociation))
             intermediary.create(
               singular_target + "_ids" => new_collection_ids,
-              relation.parent_model_id_field => relation.id 
+              relation.parent_model_id_field => relation.id
             )
           else
             new_collection_ids.each do |child_id|
               intermediary.create(
-                singular_target + "_id" => child_id, 
-                relation.parent_model_id_field => relation.id 
+                singular_target + "_id" => child_id,
+                relation.parent_model_id_field => relation.id
               )
             end
           end
@@ -132,7 +132,7 @@ module PassiveRecord
         associate!(association)
 
         define_method(:"#{collection_name_sym}=") do |new_collection|
-          relation = relata.detect { |rel| rel.association == association }
+          relation = detect_relation(association)
 
           # detach existing children...
           relation.all.each do |child|
@@ -146,21 +146,26 @@ module PassiveRecord
         end
 
         define_method(:"#{collection_name_sym.to_s.singularize}_ids=") do |new_collection_ids|
-          relation = relata.detect { |rel| rel.association == association }
+          relation = detect_relation(association) #@ relata.detect { |rel| rel.association == association }
           send(:"#{collection_name_sym}=", relation.child_class.find(new_collection_ids))
         end
       end
 
       define_method(collection_name_sym) do
-        relata.detect { |rel| rel.association == association }
+        detect_relation(association)
+        # relata.detect { |rel| rel.association == association }
       end
 
       define_method(:"#{collection_name_sym.to_s.singularize}_ids") do
-        send(collection_name_sym).map(&:id)
+        begin
+          send(collection_name_sym).map(&:id)
+        rescue
+          binding.pry
+        end
       end
 
       define_method(:"create_#{collection_name_sym.to_s.singularize}") do |attrs={}|
-        relation = relata.detect { |rel| rel.association == association }
+        relation = detect_relation(association) # relata.detect { |rel| rel.association == association }
         relation.create(attrs)
       end
     end

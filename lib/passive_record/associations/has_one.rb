@@ -40,9 +40,11 @@ module PassiveRecord
       end
 
       def child_class
-	module_name = association.parent_class.name.deconstantize
-	module_name = "Object" if module_name.empty?
-	(module_name.constantize).const_get(association.child_class_name.singularize)
+        @child_class ||= (
+          module_name = association.parent_class.name.deconstantize
+          module_name = "Object" if module_name.empty?
+          (module_name.constantize).const_get(association.child_class_name.singularize)
+        )
       end
 
       def id

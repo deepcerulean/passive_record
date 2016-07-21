@@ -288,64 +288,124 @@ describe "passive record models" do
         end
 
         context 'querying with scopes through relationships' do
-          let!(:network) { Network.create }
-          let!(:stream) { network.create_stream }
-          let!(:channel) { stream.create_channel }
-          let!(:feed) { channel.create_feed }
-          let!(:a_blog) { feed.create_blog }
+          let(:network) { Network.create }
+          let(:stream) { network.create_stream }
+          let(:channel) { stream.create_channel }
+          let(:feed) { channel.create_feed }
+          let(:a_blog) { feed.create_blog }
+
           let!(:not_recent_post) { a_blog.create_post(published_at: 10.days.ago) }
           let!(:recent_post) do
             a_blog.create_post(published_at: 1.day.ago)
           end
 
+          let!(:special_category)   { recent_post.create_category(special: true) }
+          let!(:unspecial_category) { recent_post.create_category(special: false) }
+
+          let!(:approved_comment)   { recent_post.create_comment(approved: true) }
+          let!(:unapproved_comment) { recent_post.create_comment(approved: false) }
+
+          ###
+          #
+          let(:another_network) { Network.create }
+          let(:another_stream) { another_network.create_stream }
+          let(:another_channel) { another_stream.create_channel }
+          let(:another_feed) { another_channel.create_feed }
+          let(:another_blog) { another_feed.create_blog }
+
+
+          let!(:post_from_unrelated_blog) { another_blog.create_post(published_at: 1.day.ago) }
+          let!(:unrelated_comment) do
+            post_from_unrelated_blog.create_comment(approved: true)
+          end
+
+          let!(:another_category) do
+            post_from_unrelated_blog.create_category(special: true)
+          end
+
           describe 'should find related models through a has many' do
-            it 'should restrict' do
+            it 'should refine' do
               expect(a_blog.posts.recent).to include(recent_post)
               expect(a_blog.posts.recent).not_to include(not_recent_post)
+            end
+
+            it 'should restrict' do
+              a_blog.posts.all.each do |post|
+                expect(another_blog.posts.all.map(&:id)).not_to include(post.id)
+              end
             end
           end
 
           describe 'should find related models on a has_many through' do
-            it 'should restrict' do
+            it 'should refine' do
               expect(feed.posts.recent).to include(recent_post)
               expect(feed.posts.recent).not_to include(not_recent_post)
+            end
+
+            it 'should restrict' do
+              feed.posts.each do |post|
+                expect(another_feed.posts).not_to include(post)
+              end
             end
           end
 
           describe 'should find related models on a nested has_many thru' do
-            it 'should restrict' do
+            it 'should refine' do
               expect(channel.posts.recent).to include(recent_post)
               expect(channel.posts.recent).not_to include(not_recent_post)
+            end
+
+            it 'should restrict' do
+              channel.posts.each do |post|
+                expect(another_channel.posts).not_to include(post)
+              end
             end
           end
 
           describe 'should find related models on a double-nested has_many thru' do
-            it 'should restrict' do
+            it 'should refine' do
               expect(stream.posts.recent).to include(recent_post)
               expect(stream.posts.recent).not_to include(not_recent_post)
+            end
+
+            it 'should restrict' do
+              expect(stream.posts.all).not_to be_empty
+              stream.posts.all.each do |post|
+                expect(another_stream.posts.all).not_to include(post)
+              end
             end
           end
 
           describe 'should find related models on a deeply nested has_many thru' do
-            it 'should restrict' do
+            it 'should refine' do
               expect(network.posts.recent).to include(recent_post)
               expect(network.posts.recent).not_to include(not_recent_post)
+            end
+
+            it 'should restrict' do
+              network.posts.all.each do |post|
+                expect(another_network.posts.all.map(&:id)).not_to include(post.id)
+              end
             end
           end
 
           describe 'should find related models on a recursive has_many thru' do
-            let!(:approved_comment) { Post.first.create_comment(approved: true) }
-            let!(:unapproved_comment) { Post.last.create_comment(approved: false) }
-
-            it 'should refine/restrict' do
+            it 'should refine' do
               expect(network.comments.approved).to include(approved_comment)
               expect(network.comments.approved).not_to include(unapproved_comment)
+            end
+
+            it 'should restrict' do
+              expect(network.comments.all).not_to be_empty
+              network.comments.all.each do |comment|
+                expect(another_network.comments).not_to include(comment)
+              end
             end
           end
 
           describe 'should find related models a recursive has_many :thru a habtm' do
-            let!(:promoted_tag) { Post.first.create_tag(promoted: true) }
-            let!(:unpromoted_tag) { Post.last.create_tag(promoted: false) }
+            let!(:promoted_tag) { recent_post.create_tag(promoted: true) }
+            let!(:unpromoted_tag) { recent_post.create_tag(promoted: false) }
 
             it 'should refine and restrict' do
               expect(network.tags.promoted).to include(promoted_tag)
@@ -354,12 +414,18 @@ describe "passive record models" do
           end
 
           describe 'should find related nested models through a manual habtm' do
-            let!(:special_category) { Post.first.create_category(special: true) }
-            let!(:unspecial_category) { Post.last.create_category(special: false) }
 
-            it 'should refine and restrict' do
+            it 'should refine' do
               expect(network.categories.special).to include(special_category)
               expect(network.categories.special).not_to include(unspecial_category)
+            end
+
+            it 'should restrict' do
+              expect(another_network.categories.all).not_to be_empty
+              expect(network.categories.all).not_to be_empty
+              another_network.categories.where.all.each do |category|
+                expect(network.categories.where.all).not_to include(category)
+              end
             end
           end
         end
