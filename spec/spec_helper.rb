@@ -1,6 +1,3 @@
-require "codeclimate-test-reporter"
-CodeClimate::TestReporter.start
-
 require 'rspec'
 require 'pry'
 require 'passive_record'
