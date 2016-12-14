@@ -305,6 +305,9 @@ describe "passive record models" do
           let!(:approved_comment)   { recent_post.create_comment(approved: true) }
           let!(:unapproved_comment) { recent_post.create_comment(approved: false) }
 
+          let!(:promoted_tag) { recent_post.create_tag(promoted: true) }
+          let!(:unpromoted_tag) { recent_post.create_tag(promoted: false) }
+
           ###
           #
           let(:another_network) { Network.create }
@@ -322,6 +325,8 @@ describe "passive record models" do
           let!(:another_category) do
             post_from_unrelated_blog.create_category(special: true)
           end
+
+          let!(:another_tag) { post_from_unrelated_blog.create_tag(promoted: true) }
 
           describe 'should find related models through a has many' do
             it 'should refine' do
@@ -369,9 +374,9 @@ describe "passive record models" do
             end
 
             it 'should restrict' do
-              expect(stream.posts.all).not_to be_empty
-              stream.posts.all.each do |post|
-                expect(another_stream.posts.all).not_to include(post)
+              expect(stream.posts.where.all).not_to be_empty
+              stream.posts.where.all.each do |post|
+                expect(another_stream.posts.where.all).not_to include(post)
               end
             end
           end
@@ -404,17 +409,22 @@ describe "passive record models" do
           end
 
           describe 'should find related models a recursive has_many :thru a habtm' do
-            let!(:promoted_tag) { recent_post.create_tag(promoted: true) }
-            let!(:unpromoted_tag) { recent_post.create_tag(promoted: false) }
 
-            it 'should refine and restrict' do
+            it 'should refine' do
               expect(network.tags.promoted).to include(promoted_tag)
               expect(network.tags.promoted).not_to include(unpromoted_tag)
+            end
+
+            it 'should restrict' do
+              expect(network.tags.all).not_to be_empty
+              expect(another_network.tags.all).not_to be_empty
+              network.tags.all.each do |tag|
+                expect(another_network.tags.all).not_to include(tag)
+              end
             end
           end
 
           describe 'should find related nested models through a manual habtm' do
-
             it 'should refine' do
               expect(network.categories.special).to include(special_category)
               expect(network.categories.special).not_to include(unspecial_category)

@@ -34,7 +34,7 @@ module PassiveRecord
           raw_all.select(&matching)
         end
       end
-      def_delegators :all, :sample
+      def_delegators :all, :sample, :uniq, :count
 
       def raw_all
         @klass.all
