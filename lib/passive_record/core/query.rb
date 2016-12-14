@@ -70,8 +70,9 @@ module PassiveRecord
         @klass.create(@conditions.merge(attrs))
       end
 
-      def first_or_create
-        first || create
+      def first_or_create(*args)
+        q = where(*args)
+        q.first || q.create
       end
 
       def where(new_conditions={})

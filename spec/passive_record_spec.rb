@@ -100,6 +100,12 @@ describe "passive record models" do
         end
       end
 
+      describe "#first_or_create" do
+        it 'should assign attributes' do
+
+        end
+      end
+
       describe "#destroy_all" do
         before {
           SimpleModel.create(foo: 'val1')
@@ -142,6 +148,9 @@ describe "passive record models" do
               it 'should create the object or return matching' do
                 expect{SimpleModel.where(id: 'another_id').first_or_create }.to change{SimpleModel.count}.by(1)
                 expect{SimpleModel.where(id: 'another_id').first_or_create }.not_to change{SimpleModel.count}
+
+                expect{SimpleModel.where(id: 'another_id').first_or_create(foo: 'ack') }.not_to change{SimpleModel.count}
+                expect(SimpleModel.find('another_id').foo).to eq('ack')
               end
             end
           end
