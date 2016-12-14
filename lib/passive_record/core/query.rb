@@ -34,7 +34,7 @@ module PassiveRecord
           raw_all.select(&matching)
         end
       end
-      def_delegators :all, :sample
+      def_delegators :all, :sample, :uniq, :count
 
       def raw_all
         @klass.all
@@ -70,8 +70,9 @@ module PassiveRecord
         @klass.create(@conditions.merge(attrs))
       end
 
-      def first_or_create
-        first || create
+      def first_or_create(*args)
+        q = where(*args)
+        q.first || q.create
       end
 
       def where(new_conditions={})

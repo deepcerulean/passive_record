@@ -53,18 +53,8 @@ module PassiveRecord
     end
 
     def detect_relation(assn)
-      @_associations ||= {}
-      @_associations[assn] ||= (
-        relata.detect { |rel| rel.association == assn }
-      )
-    end
-
-    private
-
-    def relata
-      @_relata ||= self.class.associations && self.class.associations.map do |assn|
-        assn.to_relation(self)
-      end || []
+      @_relata ||= {}
+      @_relata[assn] ||= assn.to_relation(self)
     end
   end
 end
